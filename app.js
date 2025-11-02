@@ -1,4 +1,5 @@
 // Global state
+const MAX_STIMULI = 3;
 let participantData = {
     info: {},
     phq9: {},
@@ -330,6 +331,11 @@ async function loadStimuliConfig() {
         
         if (stimuliConfig.length === 0) {
             throw new Error('No valid stimuli found in CSV file');
+        }
+        // DEVELOPMENT: Limit to MAX_STIMULI images for testing
+        if (stimuliConfig.length > MAX_STIMULI) {
+            stimuliConfig = stimuliConfig.slice(0, MAX_STIMULI);
+            console.log(`Development mode: Limited to first ${MAX_STIMULI} stimuli`);
         }
         
         console.log('Loaded', stimuliConfig.length, 'stimuli configurations');
