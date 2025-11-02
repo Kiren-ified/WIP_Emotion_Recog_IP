@@ -1,4 +1,5 @@
-images/
-stimuli.csv
-outputs/
 .DS_Store
+stimuli.csv
+images/
+outputs/
+output/
