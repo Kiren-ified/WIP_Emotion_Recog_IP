@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Emotion Recognition Experiment</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+</head>
+<body>
+    <!-- Consent Page -->
+    <div id="consent-page" class="page active">
+        <div class="container">
+            <h1>Research Study Consent</h1>
+            <div class="consent-text">
+                <p>You are being invited to participate in an emotion recognition research study. This study aims to understand how individuals perceive and identify emotions in visual stimuli.</p>
+                <p><strong>What you need to know:</strong></p>
+                <ul>
+                    <li>This experiment involves viewing images and identifying emotions</li>
+                    <li>Your video will be recorded during the stimulus presentation phase</li>
+                    <li>Your participation is voluntary and you can withdraw at any time</li>
+                    <li>All data will be stored locally on this device</li>
+                    <li>Your responses and video recording will be used solely for research purposes</li>
+                </ul>
+                <p>By clicking "I Consent" below, you acknowledge that you have read and understood this information and agree to participate in this study.</p>
+            </div>
+            <button class="btn-primary" onclick="nextPage('consent-page', 'info-page')">I Consent</button>
+        </div>
+    </div>
+
+    <!-- Info Page -->
+    <div id="info-page" class="page">
+        <div class="container">
+            <h1>Participant Information</h1>
+            <form id="info-form">
+                <div class="form-group">
+                    <label for="participant-id">Participant ID:</label>
+                    <input type="text" id="participant-id" name="participantId" required>
+                </div>
+                <div class="form-group">
+                    <label for="performer">Are you a performer?</label>
+                    <select id="performer" name="performer" required>
+                        <option value="">Select an option</option>
+                        <option value="yes">Yes</option>
+                        <option value="no">No</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="age">Age:</label>
+                    <input type="number" id="age" name="age" min="18" required>
+                </div>
+                <div class="form-group">
+                    <label for="gender">Gender:</label>
+                    <select id="gender" name="gender" required>
+                        <option value="">Select an option</option>
+                        <option value="male">Male</option>
+                        <option value="female">Female</option>
+                        <option value="non-binary">Non-binary</option>
+                        <option value="prefer-not-to-say">Prefer not to say</option>
+                    </select>
+                </div>
+            </form>
+            <button class="btn-primary" onclick="submitInfo()">Continue</button>
+        </div>
+    </div>
+
+    <!-- Assessment Page - PHQ9 -->
+    <div id="assessment-phq9-page" class="page">
+        <div class="container">
+            <h1>PHQ-9 Depression Assessment</h1>
+            <p class="instructions">Over the last 2 weeks, how often have you been bothered by any of the following problems?</p>
+            <form id="phq9-form">
+                <div id="phq9-questions"></div>
+            </form>
+            <button class="btn-primary" onclick="submitAssessment('phq9', 'assessment-gad7-page')">Continue</button>
+        </div>
+    </div>
+
+    <!-- Assessment Page - GAD7 -->
+    <div id="assessment-gad7-page" class="page">
+        <div class="container">
+            <h1>GAD-7 Anxiety Assessment</h1>
+            <p class="instructions">Over the last 2 weeks, how often have you been bothered by the following problems?</p>
+            <form id="gad7-form">
+                <div id="gad7-questions"></div>
+            </form>
+            <button class="btn-primary" onclick="submitAssessment('gad7', 'instructions-page')">Continue</button>
+        </div>
+    </div>
+
+    <!-- Instructions Page -->
+    <div id="instructions-page" class="page">
+        <div class="container">
+            <h1>Experiment Instructions</h1>
+            <div class="instructions-content">
+                <p>In this experiment, you will be shown a series of images. Each image will be displayed for 1 second.</p>
+                <p>After each image, you will see four emotion labels. Use the arrow keys to select which emotion you think was presented in the image:</p>
+                <ul>
+                    <li><strong>Left Arrow (←)</strong>: First option</li>
+                    <li><strong>Down Arrow (↓)</strong>: Second option</li>
+                    <li><strong>Up Arrow (↑)</strong>: Third option</li>
+                    <li><strong>Right Arrow (→)</strong>: Fourth option</li>
+                </ul>
+                <p>Your video will be recorded during the experiment to capture your facial expressions.</p>
+                <p><strong>Please ensure you grant camera permission when prompted.</strong></p>
+            </div>
+            <button class="btn-primary" id="camera-permission-btn" onclick="requestCameraPermission()">Grant Camera Permission</button>
+            <button class="btn-primary" id="start-experiment-btn" onclick="nextPage('instructions-page', 'stimuli-page')" style="display: none;">Start Experiment</button>
+        </div>
+    </div>
+
+    <!-- Stimuli Page -->
+    <div id="stimuli-page" class="page">
+        <div class="container">
+            <div id="image-display-area">
+                <video id="participant-video" autoplay muted playsinline style="position: fixed; top: -9999px; left: -9999px; width: 1px; height: 1px; opacity: 0; pointer-events: none; z-index: -1;"></video>
+                <canvas id="video-canvas" style="display: none;"></canvas>
+            </div>
+            <div id="stimulus-image-container" style="text-align: center; margin: 20px 0;">
+                <img id="stimulus-image" style="max-width: 80%; max-height: 500px; display: none;">
+            </div>
+            <div id="emotion-options" style="display: none;">
+                <p style="font-size: 18px; margin: 20px 0;">Select the emotion using arrow keys:</p>
+                <div class="options-grid" id="options-container"></div>
+            </div>
+            <div id="waiting-message" style="text-align: center; margin-top: 50px;">
+                <p>Loading experiment...</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Thank You Page -->
+    <div id="thankyou-page" class="page">
+        <div class="container">
+            <h1>Thank You!</h1>
+            <p>Thank you for participating in this emotion recognition study. Your responses have been recorded.</p>
+            <p>If you have any questions or would like more information about this research, please contact us at:</p>
+            <p><strong>xyz@gmail.com</strong></p>
+            <p>Your data has been saved locally on this device.</p>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
+
