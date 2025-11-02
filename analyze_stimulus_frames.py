@@ -1,20 +1,21 @@
 #!/usr/bin/env python3
 """
-Extract frames at 300ms after each stimulus presentation for analysis.
+Extract frames at a specified time offset after each stimulus presentation for analysis.
 
 This script:
 1. Reads participant metadata Excel file
 2. Opens the video recording
-3. Extracts frames at 300ms after each stimulus presentation
+3. Extracts frames at specified time offset after each stimulus presentation
 4. Saves frames as images
 5. Calls analyze_image function (user-defined) on each frame
 6. Generates output JSON with all data
 
 Usage:
-    python3 analyze_stimulus_frames.py <participant_id>
+    python3 analyze_stimulus_frames.py <participant_id> [--offset MILLISECONDS]
 
 Example:
     python3 analyze_stimulus_frames.py P001
+    python3 analyze_stimulus_frames.py P001 --offset 500
 """
 
 import sys
@@ -22,7 +23,14 @@ import json
 from pathlib import Path
 import pandas as pd
 import cv2
+import argparse
 from typing import Dict, List, Any
+
+# ============================================================================
+# CONFIGURATION - Change this value to adjust the time offset for frame extraction
+# ============================================================================
+DEFAULT_FRAME_OFFSET_MS = 300  # Time in milliseconds after stimulus presentation
+# ============================================================================
 
 
 def analyze_image(image_path: str, stimulus_info: Dict[str, Any]) -> Dict[str, Any]:
@@ -93,13 +101,14 @@ def extract_frame_at_timestamp(video_path: Path, timestamp_ms: float, output_pat
         return False
 
 
-def process_participant(participant_id: str, base_dir: Path) -> Dict[str, Any]:
+def process_participant(participant_id: str, base_dir: Path, frame_offset_ms: int = DEFAULT_FRAME_OFFSET_MS) -> Dict[str, Any]:
     """
     Process all stimuli for a participant.
 
     Args:
         participant_id: Participant ID (e.g., "P001")
         base_dir: Base directory containing output folder
+        frame_offset_ms: Time offset in milliseconds after stimulus presentation (default: 300ms)
 
     Returns:
         Dictionary with all analysis results
@@ -129,15 +138,17 @@ def process_participant(participant_id: str, base_dir: Path) -> Dict[str, Any]:
         raise FileNotFoundError(f"Video file not found for {participant_id}")
 
     print(f"Processing video: {video_file}")
+    print(f"Frame offset: {frame_offset_ms}ms after stimulus presentation")
 
     # Create frames directory
-    frames_dir = participant_folder / "frames_300ms"
+    frames_dir = participant_folder / f"frames_{frame_offset_ms}ms"
     frames_dir.mkdir(exist_ok=True)
 
     # Process each stimulus
     results = {
         "participant_id": participant_id,
         "video_file": str(video_file),
+        "frame_offset_ms": frame_offset_ms,
         "analysis_timestamp": pd.Timestamp.now().isoformat(),
         "stimuli": []
     }
@@ -149,11 +160,13 @@ def process_participant(participant_id: str, base_dir: Path) -> Dict[str, Any]:
 
         stimulus_name = row['Image']
 
-        # Get timestamp for frame extraction (300ms after stimulus start)
-        if 'Frame at 300ms (ms)' in df.columns:
-            timestamp_ms = row['Frame at 300ms (ms)']
-        elif 'Stimulus Start Time (ms)' in df.columns:
-            timestamp_ms = row['Stimulus Start Time (ms)'] + 300
+        # Get timestamp for frame extraction (offset after stimulus start)
+        if 'Stimulus Start Time (ms)' in df.columns:
+            timestamp_ms = row['Stimulus Start Time (ms)'] + frame_offset_ms
+        elif 'Frame at 300ms (ms)' in df.columns:
+            # Fallback: use pre-calculated 300ms column and adjust for offset
+            base_timestamp = row['Frame at 300ms (ms)'] - 300
+            timestamp_ms = base_timestamp + frame_offset_ms
         else:
             print(f"Warning: No timestamp information for {stimulus_name}, skipping")
             continue
@@ -164,11 +177,11 @@ def process_participant(participant_id: str, base_dir: Path) -> Dict[str, Any]:
             continue
 
         # Generate frame filename
-        frame_filename = f"{participant_id}_{stimulus_name.replace('.jpg', '')}_300ms.jpg"
+        frame_filename = f"{participant_id}_{stimulus_name.replace('.jpg', '')}_{frame_offset_ms}ms.jpg"
         frame_path = frames_dir / frame_filename
 
         # Extract frame
-        print(f"Extracting frame for {stimulus_name} at {timestamp_ms}ms...")
+        print(f"Extracting frame for {stimulus_name} at {timestamp_ms}ms ({frame_offset_ms}ms after stimulus)...")
         success = extract_frame_at_timestamp(video_file, timestamp_ms, frame_path)
 
         if not success:
@@ -209,30 +222,42 @@ def process_participant(participant_id: str, base_dir: Path) -> Dict[str, Any]:
 
 def main():
     """Main entry point."""
-    if len(sys.argv) < 2:
-        print("Usage: python3 analyze_stimulus_frames.py <participant_id>")
-        print("Example: python3 analyze_stimulus_frames.py P001")
-        sys.exit(1)
+    parser = argparse.ArgumentParser(
+        description='Extract and analyze video frames at specified time offset after stimulus presentation.',
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog=f"""
+Examples:
+  python3 analyze_stimulus_frames.py P001
+  python3 analyze_stimulus_frames.py P001 --offset 500
 
-    participant_id = sys.argv[1]
+Default frame offset: {DEFAULT_FRAME_OFFSET_MS}ms
+        """
+    )
+    parser.add_argument('participant_id', help='Participant ID (e.g., P001)')
+    parser.add_argument('--offset', type=int, default=DEFAULT_FRAME_OFFSET_MS,
+                        help=f'Time offset in milliseconds after stimulus presentation (default: {DEFAULT_FRAME_OFFSET_MS}ms)')
+
+    args = parser.parse_args()
     base_dir = Path(__file__).parent
 
     print(f"\n{'='*60}")
-    print(f"Analyzing stimulus frames for participant: {participant_id}")
+    print(f"Analyzing stimulus frames for participant: {args.participant_id}")
+    print(f"Frame offset: {args.offset}ms after stimulus presentation")
     print(f"{'='*60}\n")
 
     try:
         # Process participant
-        results = process_participant(participant_id, base_dir)
+        results = process_participant(args.participant_id, base_dir, args.offset)
 
         # Save results to JSON
-        output_file = base_dir / "output" / participant_id / f"{participant_id}_frame_analysis.json"
+        output_file = base_dir / "output" / args.participant_id / f"{args.participant_id}_frame_analysis_{args.offset}ms.json"
         with open(output_file, 'w') as f:
             json.dump(results, f, indent=2)
 
         print(f"\n{'='*60}")
         print(f"Analysis complete!")
         print(f"Processed {len(results['stimuli'])} stimuli")
+        print(f"Frame offset: {args.offset}ms")
         print(f"Results saved to: {output_file}")
         print(f"{'='*60}\n")
 
