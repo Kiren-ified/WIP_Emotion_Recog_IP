@@ -332,13 +332,6 @@ async function loadStimuliConfig() {
             throw new Error('No valid stimuli found in CSV file');
         }
         
-        // DEVELOPMENT: Limit to 2 images for testing
-        const MAX_STIMULI = 2;
-        if (stimuliConfig.length > MAX_STIMULI) {
-            stimuliConfig = stimuliConfig.slice(0, MAX_STIMULI);
-            console.log(`Development mode: Limited to first ${MAX_STIMULI} stimuli`);
-        }
-        
         console.log('Loaded', stimuliConfig.length, 'stimuli configurations');
         
         // Validate required fields
