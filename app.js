@@ -1,4 +1,5 @@
 // Global state
+const MAX_STIMULI = 3;
 let participantData = {
     info: {},
     phq9: {},
@@ -331,6 +332,11 @@ async function loadStimuliConfig() {
         if (stimuliConfig.length === 0) {
             throw new Error('No valid stimuli found in CSV file');
         }
+        // DEVELOPMENT: Limit to MAX_STIMULI images for testing
+        if (stimuliConfig.length > MAX_STIMULI) {
+            stimuliConfig = stimuliConfig.slice(0, MAX_STIMULI);
+            console.log(`Development mode: Limited to first ${MAX_STIMULI} stimuli`);
+        }
         
         console.log('Loaded', stimuliConfig.length, 'stimuli configurations');
         
@@ -564,6 +570,8 @@ function selectOption(key, config, stimulusStartTime) {
         isCorrect: isCorrect,
         reactionTime: reactionTime,
         timestamp: new Date().toISOString(),
+        stimulusStartTime: stimulusStartTime, // Absolute timestamp when stimulus was shown
+        stimulusStartOffset: stimulusStartTime - participantData.startTime, // Milliseconds since experiment start
         config: config // Store full config for later use
     });
     
@@ -903,13 +911,13 @@ function saveMetadataExcel(participantId, accuracy) {
     // Create a copy of stimuli.csv with user responses and reaction times
     // Include all original columns plus new columns
     const stimuliData = [
-        ['Image', 'Gender', 'Model', 'Race', 'Mouth', 'Corr_emotion', 'option1', 'option2', 'option3', 'option4', 'User response', 'Reaction Time (ms)'],
+        ['Image', 'Gender', 'Model', 'Race', 'Mouth', 'Corr_emotion', 'option1', 'option2', 'option3', 'option4', 'User response', 'Reaction Time (ms)', 'Stimulus Start Time (ms)', 'Frame at 300ms (ms)'],
         ...participantData.stimuli.map(s => {
             const config = s.config || stimuliConfig.find(c => c.imageName === s.imageName);
             if (!config) {
-                return [s.imageName, '', '', '', '', '', '', '', '', '', s.selectedLabel || '', s.reactionTime];
+                return [s.imageName, '', '', '', '', '', '', '', '', '', s.selectedLabel || '', s.reactionTime, s.stimulusStartOffset || '', (s.stimulusStartOffset || 0) + 300];
             }
-            
+
             return [
                 config.imageName,
                 config.metadata?.gender || '',
@@ -922,7 +930,9 @@ function saveMetadataExcel(participantId, accuracy) {
                 config.option3 || '',
                 config.option4 || '',
                 s.selectedLabel || '', // User's selected emotion label
-                s.reactionTime // Reaction time in milliseconds
+                s.reactionTime, // Reaction time in milliseconds
+                s.stimulusStartOffset || '', // Time from video start when stimulus was shown
+                (s.stimulusStartOffset || 0) + 300 // Time from video start for 300ms frame
             ];
         })
     ];
