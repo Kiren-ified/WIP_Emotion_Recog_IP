@@ -200,12 +200,9 @@ h1 {
     background: white;
     transition: all 0.3s;
     cursor: pointer;
+    user-select: none;
 }
 
-.option-item:hover {
-    border-color: #667eea;
-    background: #f0f4ff;
-}
 
 .option-item.selected {
     border-color: #667eea;

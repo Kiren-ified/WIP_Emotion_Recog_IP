@@ -484,76 +484,47 @@ function showOptions(config, stimulusStartTime) {
         return str.charAt(0).toUpperCase() + str.slice(1);
     };
     
-    // Arrow key to option mapping (one-to-one):
-    // ArrowLeft  → option1 (first option)
-    // ArrowDown  → option2 (second option)
-    // ArrowUp    → option3 (third option)
-    // ArrowRight → option4 (fourth option)
-    // Each arrow key maps to exactly one option - users can only select one of the 4 displayed options
+    // Options for clicking
     const options = [
-        { key: 'ArrowLeft', label: capitalize(config.option1) || 'Option 1', value: 'option1' },
-        { key: 'ArrowDown', label: capitalize(config.option2) || 'Option 2', value: 'option2' },
-        { key: 'ArrowUp', label: capitalize(config.option3) || 'Option 3', value: 'option3' },
-        { key: 'ArrowRight', label: capitalize(config.option4) || 'Option 4', value: 'option4' }
+        { label: capitalize(config.option1) || 'Option 1', value: 'option1' },
+        { label: capitalize(config.option2) || 'Option 2', value: 'option2' },
+        { label: capitalize(config.option3) || 'Option 3', value: 'option3' },
+        { label: capitalize(config.option4) || 'Option 4', value: 'option4' }
     ];
+    
+    // Track if an option has been selected to prevent multiple selections
+    let optionSelected = false;
     
     options.forEach((option, index) => {
         const optionDiv = document.createElement('div');
         optionDiv.className = 'option-item';
         optionDiv.innerHTML = `
-            <div class="key-hint">${getKeyHint(option.key)}</div>
             <div>${option.label}</div>
         `;
-        optionDiv.dataset.key = option.key;
         optionDiv.dataset.value = option.value;
+        
+        // Add click handler
+        optionDiv.addEventListener('click', () => {
+            if (!optionSelected) {
+                optionSelected = true;
+                selectOption(optionDiv, config, stimulusStartTime);
+            }
+        });
+        
         optionsContainer.appendChild(optionDiv);
     });
     
-    // All options start in neutral state - no highlighting until user presses a key
-    
-    // Set up keyboard handler - only accepts the 4 arrow keys
-    // User can only select one of the 4 displayed options using arrow keys
-    const keyHandler = (e) => {
-        if (['ArrowLeft', 'ArrowDown', 'ArrowUp', 'ArrowRight'].includes(e.key)) {
-            e.preventDefault();
-            selectOption(e.key, config, stimulusStartTime);
-            // Remove handler after selection to prevent multiple selections
-            document.removeEventListener('keydown', keyHandler);
-        }
-    };
-    
-    document.addEventListener('keydown', keyHandler);
+    // All options start in neutral state - no highlighting until user clicks
 }
 
-function getKeyHint(key) {
-    const hints = {
-        'ArrowLeft': '← Left Arrow',
-        'ArrowDown': '↓ Down Arrow',
-        'ArrowUp': '↑ Up Arrow',
-        'ArrowRight': '→ Right Arrow'
-    };
-    return hints[key] || key;
-}
 
-function highlightOption(index) {
-    const options = document.querySelectorAll('.option-item');
-    options.forEach((opt, i) => {
-        opt.classList.remove('selected');
-        if (i === index) {
-            opt.classList.add('selected');
-        }
-    });
-}
-
-function selectOption(key, config, stimulusStartTime) {
+function selectOption(optionDiv, config, stimulusStartTime) {
     const reactionTime = Date.now() - stimulusStartTime;
-    const optionDiv = document.querySelector(`[data-key="${key}"]`);
     const selectedValue = optionDiv.dataset.value;
     const isCorrect = selectedValue === config.correctOption;
     
     // Get the selected emotion label (the actual text, not the option number)
-    // The label is in the second div child (first is key hint, second is label)
-    const labelDiv = optionDiv.querySelectorAll('div')[1];
+    const labelDiv = optionDiv.querySelector('div');
     const selectedLabel = labelDiv ? labelDiv.textContent.trim() : 
                          (selectedValue === 'option1' ? config.option1 :
                           selectedValue === 'option2' ? config.option2 :
