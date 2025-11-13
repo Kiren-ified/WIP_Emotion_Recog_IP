@@ -1,0 +1,49 @@
+Image,Gender,Model,Race,Mouth,Corr_emotion,option1,option2,option3,option4
+AF01_AC.jpg,Female,AF_01,Asian,Closed,Anger,disgust,sad,anger,surprise
+AF02_SUR.jpg,Female,AF_02,Asian,Open,Surprise,surprise,happy,fear,sad
+AF05_DC.jpg,Female,AF_05,Asian,Closed,Disgust,disgust,happy,sad,anger
+AF09_FO.jpg,Female,AF_09,Asian,Open,Fear ,happy,disgust,surprise,fear
+AF10_HC.jpg,Female,AF_10,Asian,Closed,Happy,anger,happy,disgust,fear
+AF12_SO.jpg,Female,AF_12,Asian,Open,Sad,anger,sad,fear,disgust
+AM02_AO.jpg,Male,AM_02,Asian,Open,Anger,disgust,surprise,fear,anger
+AM03_SUR.jpg,Male,AM_03,Asian,Open,Surprise,surprise,sad,anger,disgust
+AM04_DO.jpg,Male,AM_04,Asian,Open,Disgust,disgust,surprise,anger,fear
+AM07_FC.jpg,Male,AM_07,Asian,Closed,Fear ,surprise,fear,anger,happy
+AM09_HO.jpg,Male,AM_09,Asian,Open,Happy,happy,surprise,disgust,sad
+AM11_SC.jpg,Male,AM_11,Asian,Closed,Sad,sad,disgust,surprise,happy
+BM03_AC.jpg,Male,BM_03,Black,Closed,Anger,happy,anger,surprise,disgust
+BM04_SUR.jpg,Male,BM_04,Black,Open,Surprise,sad,fear,anger,surprise
+BM05_DC.jpg,Male,BM_05,Black,Closed,Disgust,anger,happy,disgust,surprise
+BM06_FO.jpg,Male,BM_06,Black,Open,Fear ,sad,disgust,happy,fear
+BM11_HC.jpg,Male,BM_11,Black,Closed,Happy,disgust,fear,happy,surprise
+BM15_SO.jpg,Male,BM_15,Black,Open,Sad,sad,fear,happy,anger
+BF01_AO.jpg,Female,BF_01,Black,Open,Anger,happy,anger,sad,fear
+BF03_SUR.jpg,Female,BF_03,Black,Open,Surprise,surprise,disgust,fear,anger
+BF06_DO.jpg,Female,BF_06,Black,Open,Disgust,disgust,happy,sad,anger
+BF07_FC.jpg,Female,BF_07,Black,Closed,Fear ,anger,fear,disgust,happy
+BF09_HO.jpg,Female,BF_09,Black,Open,Happy,fear,happy,disgust,sad
+BF18_SC.jpg,Female,BF_18,Black,Closed,Sad,surprise,disgust,happy,sad
+HF09_AC.jpeg,Female,HF_09,Hispanic,Closed,Anger,happy,anger,sad,fear
+HF08_SUR.jpeg,Female,HF_08,Hispanic,Open,Surprise,happy,sad,disgust,surprise
+HF10_DC.jpeg,Female,HF_10,Hispanic,Closed,Disgust,sad,fear,disgust,anger
+HF01_FO.jpeg,Female,HF_01,Hispanic,Open,Fear ,surprise,anger,happy,fear
+HF02_HC.jpeg,Female,HF_02,Hispanic,Closed,Happy,fear,anger,sad,happy
+HF04_SO.jpeg,Female,HF_04,Hispanic,Open,Sad,sad,surprise,fear,anger
+HM02_AO.jpeg,Male,HM_02,Hispanic,Open,Anger,fear,anger,surprise,disgust
+HM01_SUR.jpeg,Male,HM_01,Hispanic,Open,Surprise,happy,fear,surprise,anger
+HM04_DO.jpeg,Male,HM_04,Hispanic,Open,Disgust,sad,disgust,fear,surprise
+HM06_FC.jpeg,Male,HM_06,Hispanic,Closed,Fear ,anger,disgust,fear,happy
+HM03_HO.jpeg,Male,HM_03,Hispanic,Open,Happy,sad,anger,happy,fear
+HM08_SC.jpeg,Male,HM_08,Hispanic,Closed,Sad,fear,anger,happy,sad
+WM03_AC.jpeg,Male,WM_03,White,Closed,Anger,sad,happy,disgust,anger
+WM04_SUR.jpeg,Male,WM_04,White,Open,Surprise,surprise,anger,fear,happy
+WM05_DC.jpeg,Male,WM_05,White,Closed,Disgust,fear,disgust,anger,surprise
+WM07_FO.jpeg,Male,WM_07,White,Open,Fear ,disgust,surprise,fear,happy
+WM08_HC.jpeg,Male,WM_08,White,Closed,Happy,anger,disgust,happy,fear
+WM12_SO.jpeg,Male,WM_12,White,Open,Sad,disgust,sad,anger,fear
+WF11_AO.jpeg,Female,WF_11,White,Open,Anger,anger,surprise,sad,fear
+WF12_SUR.jpeg,Female,WF_12,White,Open,Surprise,anger,surprise,happy,disgust
+WF13_DO.jpeg,Female,WF_13,White,Open,Disgust,disgust,anger,sad,happy
+WF14_FC.jpeg,Female,WF_14,White,Closed,Fear ,disgust,fear,anger,surprise
+WF08_HO.jpeg,Female,WF_08,White,Open,Happy,anger,sad,happy,fear
+WF07_SC.jpeg,Female,WF_07,White,Closed,Sad,happy,sad,disgust,surprise
