@@ -3,7 +3,10 @@ const MAX_STIMULI = 3;
 let participantData = {
     info: {},
     sreis: {},
+    sbc: {},
     bdi: {},
+    dsm5: {},
+    des2: {},
     stimuli: [],
     startTime: null
 };
@@ -45,6 +48,191 @@ const SREIS_answers = [
     { value: 3, label: "Neither nor" },
     { value: 4, label: "Moderately accurate" },
     { value: 5, label: "Very accurate" }
+];
+
+// Scale of Body Connection (SBC) Questions - 20 items
+const SBC_QUESTIONS = [
+    "If there is tension in my body, I am aware of the tension.",
+    "It is difficult for me to identify my emotions.",
+    "I notice that my breathing becomes shallow when I am nervous.",
+    "I notice my emotional response to caring touch.",
+    "My body feels frozen, as though numb, during uncomfortble situations.",
+    "I notice how mmy body changes when I am angry.",
+    "I feel like I am looking at my body from outside of my body.",
+    "I am aware of internal sensation during sexual activity.",
+    "I can feel my breath travel through my body when I exhale deeply.",
+    "I feel separated from my body.",
+    "It is hard for me to express certain emotions.",
+    "I take cues from my body to help me understand how I feel.",
+    "When I am physically uncomfortable, I think about what might have caused the discomfort.",
+    "I listen for information from my body about my emotional state.",
+    "When I am stressed, I notice the stress in my body.",
+    "I distract myself from feelings of physical discomfort.",
+    "When I am tense, I take note of where the tension is located in my body.",
+    "I notice that my body feels different after a peaceful experience.",
+    "I feel separated from my body when I am engaged in sexual activity.",
+    "It  is difficult for me to pay attention to my emotions."
+];
+
+// SBC Rating Scale (0-4)
+const SBC_RATING_SCALE = [
+    { value: 0, label: "Not at all" },
+    { value: 1, label: "A little bit" },
+    { value: 2, label: "Some of the time" },
+    { value: 3, label: "Most of the time" },
+    { value: 4, label: "All of the time" }
+];
+
+// DSM-5-TR Level 1 Cross-Cutting Symptom Measure - 13 domains
+const DSM5_QUESTIONS = [
+    {
+        domain: "Depression",
+        question: "Little interest or pleasure in doing things."
+    },
+    {
+        domain: "Depression",
+        question: "Feeling down, depressed, or hopeless."
+    },
+    {
+        domain: "Anger",
+        question: "Feeling more irritated, grouchy or angry than usual."
+    },
+    {
+        domain: "Mania",
+        question: "Sleeping less than usual, but still have a lot of energy."
+    },
+    {
+        domain: "Mania",
+        question: "Starting lots more projects than usual or doing more risky things than usual."
+    },
+    {
+        domain: "Anxiety",
+        question: "Feeling nervous, frightened, anxious or on edge."
+    },
+    {
+        domain: "Anxiety",
+        question: "Feeling panic or being frightened"
+    },
+    {
+        domain: "Anxiety",
+        question: "Avoiding situations that make you anxious."
+    },
+    {
+        domain: "Somatic Symptoms",
+        question: "Unexplained aches and pains (e.g., head, back, joints, abdomen, legs)."
+    },
+    {
+        domain: "Somatic Symptoms",
+        question: "Feeling that your illnesses are not being taken seriously enough."
+    },
+    {
+        domain: "Suicidal Ideation",
+        question: "Thoughts of actually hurting yourself."
+    },
+    {
+        domain: "Psychosis",
+        question: "Hearing things other people couldn't hear, such as voices even when no one was around."
+    },
+    {
+        domain: "Psychosis",
+        question: "Feeling that someone could hear your thoughts, or that you could hear what another person was thinking?"
+    },
+    {
+        domain: "Sleep Problems",
+        question: "Problems with sleep that affected your sleep quality over all."
+    },
+    {
+        domain: "Memory",
+        question: "Problems with memory (e.g., learning new information) or with location (e.g., finding your way back home)."
+    },
+    {
+        domain: "Repetitive Thoughts and Behaviors",
+        question: "Unpleasant thoughts, urges, or images that repeatedly enter your mind."
+    },
+    {
+        domain: "Repetitive Thoughts and Behaviors",
+        question: "Feeling driven to perform certain behaviors or mental acts over and over again."
+    },
+    {
+        domain: "Dissociation",
+        question: "Feeling detached or distant from yourself, your body, your physicalsurroundings, or your memories"
+    },
+    {
+        domain: "Personality Functioning",
+        question: "Not knowing who you really are or what you want out of life."
+    },
+    {
+        domain: "Personality Functioning",
+        question: "Not feeling close to other people or enjoying your relationships with them."
+    },
+    {
+        domain: "Substance Use",
+        question: "Drinking at least 4 drinks of any kind of alcohol in a single day."
+    },
+    {
+        domain: "Substance Use",
+        question: "Smoking any cigarettes, a cigar, or pipe, or using snuff or chewing tobacco"
+    },
+    {
+        domain: "Substance Use",
+        question: "Using any of the following medicines ON YOUR OWN, that is, without a doctor’s prescription, in greater amounts or longer than prescribed [e.g., painkillers (like Vicodin), stimulants (like Ritalin or Adderall), sedatives or tranquilizers (like sleeping pills or Valium), or drugs like marijuana, cocaine or crack, club drugs (like ecstasy), hallucinogens (like LSD), heroin, inhalants or solvents (like glue), or methamphetamine (like speed)]."
+    },
+];
+
+// DSM-5-TR Rating Scale (0-4)
+const DSM5_RATING_SCALE = [
+    { value: 0, label: "Not at all" },
+    { value: 1, label: "Slight or rare, less than a day or two" },
+    { value: 2, label: "Mild, several days" },
+    { value: 3, label: "Moderate, more than half the days" },
+    { value: 4, label: "Severe, nearly every day" }
+];
+
+// DES-II (Dissociative Experiences Scale-II) Questions - 28 items
+const DES2_QUESTIONS = [
+    "Some people have the experience of driving a car and suddenly realizing that they don't remember what has happened during all or part of the trip.",
+    "Some people find that sometimes they are listening to someone talk and they suddenly realize that they did not hear part or all of what was said.",
+    "Some people have the experience of finding themselves in a place and having no idea how they got there.",
+    "Some people have the experience of finding themselves dressed in clothes that they don't remember putting on.",
+    "Some people have the experience of finding new things among their belongings that they don't remember buying.",
+    "Some people sometimes find that they are approached by people that they do not know, who call them by another name or insist that they have met before.",
+    "Some people sometimes have the experience of feeling as though they are standing next to themselves or watching themselves do something, and they actually see themselves as if they were looking at another person.",
+    "Some people are told that they sometimes do not recognize friends or family members.",
+    "Some people find that they have no memory for some important events in their lives (for example, a wedding or graduation).",
+    "Some people have the experience of being accused of lying when they do not think that they have lied.",
+    "Some people have the experience of looking in a mirror and not recognizing themselves.",
+    "Some people have the experience of feeling that other people, objects, and the world around them are not real.",
+    "Some people have the experience of feeling that their body does not belong to them.",
+    "Some people have the experience of sometimes remembering a past event so vividly that they feel as if they were reliving that event.",
+    "Some people have the experience of not being sure whether things that they remember happening really did happen or whether they just dreamed them.",
+    "Some people have the experience of being in a familiar place but finding it strange and unfamiliar.",
+    "Some people have the experience of feeling that they are looking at the world through a fog so that people and objects appear far away or unclear.",
+    "Some people find that when they are watching television or a movie, they become so absorbed in the story that they are unaware of other events happening around them.",
+    "Some people find that they become so involved in a fantasy or daydream that it feels as if it were really happening to them.",
+    "Some people find that they sometimes are able to ignore pain.",
+    "Some people find that they sometimes sit staring off into space, thinking of nothing, and are not aware of the passage of time.",
+    "Some people find that when they are alone, they talk out loud to themselves.",
+    "Some people find that in one situation they may act so differently compared to another situation that they feel almost as if they were two different people.",
+    "Some people sometimes have the experience of feeling as if they are looking at themselves from the outside or as if they were floating above themselves.",
+    "Some people sometimes feel that other people are robots or automatons, even though they know they are not.",
+    "Some people sometimes have the experience of feeling as if their body, or parts of their body, feel different or strange.",
+    "Some people sometimes have the experience of feeling as if the people, objects, and world around them are not real.",
+    "Some people sometimes have the experience of feeling as if they are not in control of what they are saying or doing, as if they are a robot or a zombie."
+];
+
+// DES-II Rating Scale (0-100% in 10% increments, stored as 0-10)
+const DES2_RATING_SCALE = [
+    { value: 0, label: "0% (Never)" },
+    { value: 1, label: "10%" },
+    { value: 2, label: "20%" },
+    { value: 3, label: "30%" },
+    { value: 4, label: "40%" },
+    { value: 5, label: "50%" },
+    { value: 6, label: "60%" },
+    { value: 7, label: "70%" },
+    { value: 8, label: "80%" },
+    { value: 9, label: "90%" },
+    { value: 10, label: "100% (Always)" }
 ];
 
 // BDI-II Questions (Beck Depression Inventory) - Full version with 4 statements per question
@@ -244,7 +432,10 @@ const BDI_QUESTIONS = [
 document.addEventListener('DOMContentLoaded', function() {
     loadStimuliConfig();
     renderSREIS();
+    renderSBC();
     renderBDI();
+    renderDSM5();
+    renderDES2();
     
     // Check URL hash for direct page access
     checkUrlHash();
@@ -262,7 +453,10 @@ function checkUrlHash() {
             'consent': 'consent-page',
             'info': 'info-page',
             'SREIS': 'assessment-sreis-page',
+            'sbc': 'assessment-sbc-page',
             'bdi': 'assessment-bdi-page',
+            'dsm5': 'assessment-dsm5-page',
+            'des2': 'assessment-des2-page',
             'instructions': 'instructions-page',
             'stimuli': 'stimuli-page',
             'thankyou': 'thankyou-page'
@@ -344,6 +538,36 @@ function renderSREIS() {
     });
 }
 
+function renderSBC() {
+    const container = document.getElementById('sbc-questions');
+    SBC_QUESTIONS.forEach((question, index) => {
+        const questionDiv = document.createElement('div');
+        questionDiv.className = 'question-item';
+        questionDiv.innerHTML = `
+            <label>${index + 1}. ${question}</label>
+            <div class="rating-scale">
+                ${SBC_RATING_SCALE.map((option, optIndex) => `
+                    <label class="rating-option">
+                        <input type="radio" name="sbc_q${index}" value="${option.value}" required>
+                        <span>${option.value}</span>
+                        <span>${option.label}</span>
+                    </label>
+                `).join('')}
+            </div>
+        `;
+        container.appendChild(questionDiv);
+    });
+
+    // Add click handlers for radio buttons
+    container.querySelectorAll('input[type="radio"]').forEach(radio => {
+        radio.addEventListener('change', function() {
+            const parent = this.closest('.rating-option');
+            parent.parentElement.querySelectorAll('.rating-option').forEach(opt => opt.classList.remove('selected'));
+            parent.classList.add('selected');
+        });
+    });
+}
+
 function renderBDI() {
     const container = document.getElementById('bdi-questions');
     BDI_QUESTIONS.forEach((question, index) => {
@@ -371,6 +595,66 @@ function renderBDI() {
             // Remove selected class from all options in this question group
             const questionItem = parent.closest('.question-item');
             questionItem.querySelectorAll('.bdi-statement').forEach(opt => opt.classList.remove('selected'));
+            parent.classList.add('selected');
+        });
+    });
+}
+
+function renderDSM5() {
+    const container = document.getElementById('dsm5-questions');
+    DSM5_QUESTIONS.forEach((item, index) => {
+        const questionDiv = document.createElement('div');
+        questionDiv.className = 'question-item';
+        questionDiv.innerHTML = `
+            <label>${index + 1}. ${item.question}</label>
+            <div class="rating-scale">
+                ${DSM5_RATING_SCALE.map((option, optIndex) => `
+                    <label class="rating-option">
+                        <input type="radio" name="dsm5_q${index}" value="${option.value}" required>
+                        <span>${option.value}</span>
+                        <span>${option.label}</span>
+                    </label>
+                `).join('')}
+            </div>
+        `;
+        container.appendChild(questionDiv);
+    });
+
+    // Add click handlers for radio buttons
+    container.querySelectorAll('input[type="radio"]').forEach(radio => {
+        radio.addEventListener('change', function() {
+            const parent = this.closest('.rating-option');
+            parent.parentElement.querySelectorAll('.rating-option').forEach(opt => opt.classList.remove('selected'));
+            parent.classList.add('selected');
+        });
+    });
+}
+
+function renderDES2() {
+    const container = document.getElementById('des2-questions');
+    DES2_QUESTIONS.forEach((question, index) => {
+        const questionDiv = document.createElement('div');
+        questionDiv.className = 'question-item';
+        questionDiv.innerHTML = `
+            <label>${index + 1}. ${question}</label>
+            <div class="rating-scale">
+                ${DES2_RATING_SCALE.map((option, optIndex) => `
+                    <label class="rating-option">
+                        <input type="radio" name="des2_q${index}" value="${option.value}" required>
+                        <span>${option.value * 10}%</span>
+                        <span>${option.label}</span>
+                    </label>
+                `).join('')}
+            </div>
+        `;
+        container.appendChild(questionDiv);
+    });
+
+    // Add click handlers for radio buttons
+    container.querySelectorAll('input[type="radio"]').forEach(radio => {
+        radio.addEventListener('change', function() {
+            const parent = this.closest('.rating-option');
+            parent.parentElement.querySelectorAll('.rating-option').forEach(opt => opt.classList.remove('selected'));
             parent.classList.add('selected');
         });
     });
@@ -1033,7 +1317,10 @@ function saveAssessmentsExcel(participantId) {
         
         // Debug: Check what data we have
         console.log('SREIS data:', participantData.sreis);
+        console.log('SBC data:', participantData.sbc);
         console.log('BDI data:', participantData.bdi);
+        console.log('DSM-5 data:', participantData.dsm5);
+        console.log('DES-II data:', participantData.des2);
         
         // SREIS Sheet
         const sreisData = [
@@ -1050,6 +1337,21 @@ function saveAssessmentsExcel(participantId) {
         const sreisWS = XLSX.utils.aoa_to_sheet(sreisData);
         XLSX.utils.book_append_sheet(wb, sreisWS, 'SREIS');
         
+        // SBC Sheet
+        const sbcData = [
+            ['Question', 'Score'],
+            ...SBC_QUESTIONS.map((q, i) => {
+                const key = `sbc_q${i}`;
+                const value = participantData.sbc && participantData.sbc[key] !== undefined 
+                    ? participantData.sbc[key] 
+                    : 0;
+                console.log(`SBC Q${i+1}: key="${key}", value=${value}`);
+                return [`Q${i + 1}: ${q}`, value];
+            })
+        ];
+        const sbcWS = XLSX.utils.aoa_to_sheet(sbcData);
+        XLSX.utils.book_append_sheet(wb, sbcWS, 'SBC');
+        
         // BDI Sheet
         const bdiData = [
             ['Question', 'Score'],
@@ -1064,6 +1366,36 @@ function saveAssessmentsExcel(participantId) {
         ];
         const bdiWS = XLSX.utils.aoa_to_sheet(bdiData);
         XLSX.utils.book_append_sheet(wb, bdiWS, 'BDI');
+        
+        // DSM-5 Sheet
+        const dsm5Data = [
+            ['Domain', 'Question', 'Score'],
+            ...DSM5_QUESTIONS.map((item, i) => {
+                const key = `dsm5_q${i}`;
+                const value = participantData.dsm5 && participantData.dsm5[key] !== undefined 
+                    ? participantData.dsm5[key] 
+                    : 0;
+                console.log(`DSM-5 Q${i+1}: key="${key}", value=${value}`);
+                return [item.domain, `Q${i + 1}: ${item.question}`, value];
+            })
+        ];
+        const dsm5WS = XLSX.utils.aoa_to_sheet(dsm5Data);
+        XLSX.utils.book_append_sheet(wb, dsm5WS, 'DSM-5-TR');
+        
+        // DES-II Sheet
+        const des2Data = [
+            ['Question', 'Score (0-10, representing 0-100%)'],
+            ...DES2_QUESTIONS.map((q, i) => {
+                const key = `des2_q${i}`;
+                const value = participantData.des2 && participantData.des2[key] !== undefined 
+                    ? participantData.des2[key] 
+                    : 0;
+                console.log(`DES-II Q${i+1}: key="${key}", value=${value}`);
+                return [`Q${i + 1}: ${q}`, value];
+            })
+        ];
+        const des2WS = XLSX.utils.aoa_to_sheet(des2Data);
+        XLSX.utils.book_append_sheet(wb, des2WS, 'DES-II');
         
         const excelBlob = XLSX.write(wb, { type: 'array', bookType: 'xlsx' });
         console.log(`Downloading assessment Excel for ${participantId}...`);

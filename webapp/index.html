@@ -76,7 +76,22 @@
             <form id="sreis-form">
                 <div id="sreis-questions"></div>
             </form>
-            <button class="btn-primary" onclick="submitAssessment('sreis', 'assessment-bdi-page')">Continue</button>
+            <button class="btn-primary" onclick="submitAssessment('sreis', 'assessment-sbc-page')">Continue</button>
+        </div>
+    </div>
+
+    <!-- Assessment Page - SBC -->
+    <div id="assessment-sbc-page" class="page">
+        <div class="container">
+            <h1>Scale of Body Connection (SBC)</h1>
+            <p class="instructions">For each statement please check the box that best answers the way you generally feel.
+                There are no right answers, please answer as truthfully as you can. There are two questions about sexual
+                activity; please consider all sexual activity including self-stimulation. If you do not engage in sexual activity,
+                please leave these questions blank.</p>
+            <form id="sbc-form">
+                <div id="sbc-questions"></div>
+            </form>
+            <button class="btn-primary" onclick="submitAssessment('sbc', 'assessment-bdi-page')">Continue</button>
         </div>
     </div>
 
@@ -84,11 +99,35 @@
     <div id="assessment-bdi-page" class="page">
         <div class="container">
             <h1>Beck Depression Inventory (BDI-II)</h1>
-            <p class="instructions">This questionnaire consists of 21 groups of statements. Please read each group of statements carefully, and then pick out the one statement in each group that best describes the way you have been feeling during the past two weeks, including today. Circle or select the number beside the statement you picked. If several statements in the group seem to apply equally well, circle the highest number for that group.</p>
+            <p class="instructions">This questionnaire consists of 21 groups of statements. Please read each group of statements carefully, and then pick out the one statement in each group that best describes the way you have been feeling during the past two weeks, including today. If several statements in the group seem to apply equally well, select the highest number for that group.</p>
             <form id="bdi-form">
                 <div id="bdi-questions"></div>
             </form>
-            <button class="btn-primary" onclick="submitAssessment('bdi', 'instructions-page')">Continue</button>
+            <button class="btn-primary" onclick="submitAssessment('bdi', 'assessment-dsm5-page')">Continue</button>
+        </div>
+    </div>
+
+    <!-- Assessment Page - DSM-5-TR -->
+    <div id="assessment-dsm5-page" class="page">
+        <div class="container">
+            <h1>DSM-5-TR Level 1 Cross-Cutting Symptom Measure</h1>
+            <p class="instructions">This measure asks about symptoms you might have experienced over the past 2 weeks. Please rate how much (or how often) you have been bothered by each problem. For each item, select the response that best describes how much (or how often) you have been bothered by that problem during the past 2 weeks, including today.</p>
+            <form id="dsm5-form">
+                <div id="dsm5-questions"></div>
+            </form>
+            <button class="btn-primary" onclick="submitAssessment('dsm5', 'assessment-des2-page')">Continue</button>
+        </div>
+    </div>
+
+    <!-- Assessment Page - DES-II -->
+    <div id="assessment-des2-page" class="page">
+        <div class="container">
+            <h1>Dissociative Experiences Scale-II (DES-II)</h1>
+            <p class="instructions">This questionnaire asks about experiences that you may have in your daily life. We are interested in how often you have these experiences. It is important, however, that your answers show how often these experiences happen to you when you are not under the influence of alcohol or drugs. To answer the questions, please determine to what degree the experience described in the question applies to you and select the appropriate percentage (0% means it never happens to you, 100% means it always happens to you).</p>
+            <form id="des2-form">
+                <div id="des2-questions"></div>
+            </form>
+            <button class="btn-primary" onclick="submitAssessment('des2', 'instructions-page')">Continue</button>
         </div>
     </div>
 
@@ -119,7 +158,7 @@
                 <img id="stimulus-image" style="max-width: 80%; max-height: 500px; display: none;">
             </div>
             <div id="emotion-options" style="display: none;">
-                <p style="font-size: 18px; margin: 20px 0;">Select the emotion using arrow keys:</p>
+                <p style="font-size: 18px; margin: 20px 0;">Select the emotion:</p>
                 <div class="options-grid" id="options-container"></div>
             </div>
             <div id="waiting-message" style="text-align: center; margin-top: 50px;">
@@ -134,8 +173,7 @@
             <h1>Thank You!</h1>
             <p>Thank you for participating in this emotion recognition study. Your responses have been recorded.</p>
             <p>If you have any questions or would like more information about this research, please contact us at:</p>
-            <p><strong>xyz@gmail.com</strong></p>
-            <p>Your data has been saved locally on this device.</p>
+            <p><strong>kb3476@tc.columbia.edu</strong></p>
         </div>
     </div>
 
