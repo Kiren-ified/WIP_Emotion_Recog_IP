@@ -230,3 +230,59 @@ h1 {
     color: #666;
 }
 
+/* BDI-specific styles */
+.question-category {
+    display: block;
+    margin-bottom: 15px;
+    color: #333;
+    font-weight: 600;
+    font-size: 16px;
+}
+
+.bdi-statements {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.bdi-statement {
+    display: flex;
+    align-items: flex-start;
+    padding: 12px 15px;
+    border: 2px solid #ddd;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s;
+    background: white;
+    text-align: left;
+}
+
+.bdi-statement:hover {
+    border-color: #667eea;
+    background: #f0f4ff;
+}
+
+.bdi-statement input[type="radio"] {
+    display: none;
+}
+
+.bdi-statement.selected {
+    border-color: #667eea;
+    background: #667eea;
+    color: white;
+}
+
+.statement-number {
+    display: inline-block;
+    min-width: 25px;
+    font-weight: 600;
+    margin-right: 12px;
+    font-size: 16px;
+}
+
+.statement-text {
+    flex: 1;
+    font-size: 15px;
+    line-height: 1.5;
+}
+

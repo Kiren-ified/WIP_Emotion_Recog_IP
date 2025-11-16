@@ -2,8 +2,8 @@
 const MAX_STIMULI = 3;
 let participantData = {
     info: {},
-    phq9: {},
-    gad7: {},
+    sreis: {},
+    bdi: {},
     stimuli: [],
     startTime: null
 };
@@ -15,42 +15,236 @@ let recordedChunks = [];
 let stream = null;
 let cameraPermissionGranted = false;
 
-// PHQ-9 Questions
-const PHQ9_QUESTIONS = [
-    "Little interest or pleasure in doing things",
-    "Feeling down, depressed, or hopeless",
-    "Trouble falling or staying asleep, or sleeping too much",
-    "Feeling tired or having little energy",
-    "Poor appetite or overeating",
-    "Feeling bad about yourself or that you are a failure or have let yourself or your family down",
-    "Trouble concentrating on things, such as reading the newspaper or watching television",
-    "Moving or speaking so slowly that other people could have noticed, or being so fidgety or restless that you have been moving around a lot more than usual",
-    "Thoughts that you would be better off dead or thoughts of hurting yourself in some way"
+// SREIS Questions
+const SREIS_QUESTIONS = [
+    "By looking at people's facial expressions, I recognize the emotions they are experiencing.",
+    "I am a rational person and I rarely, if ever, consult my feelings to make a decision.",
+    "I have problems dealing with my feelings of anger.",
+    "When someone I know is in a bad mood, I can help the person calm down and feel better quickly.",
+    "I am aware of the nonverbal messages other people send.",
+    "When making decisions, I listen to my feelings to see if the decision feels right.",
+    "I could easily write a lot of synonyms for emotion words like happiness or sadness.",
+    "I can handle stressful situations without getting too nervous.",
+    "I know the strategies to make or improve other people's moods.",
+    "I can tell when a person is lying to me by looking at his or her facial expression.",
+    "I am a rational person and don't like to rely on my feelings to make decisions.",
+    "I have the vocabulary to describe how most emotions progress from simple to complex feelings.",
+    "I am able to handle most upsetting problems.",
+    "I am not very good at helping others to feel better when they are feeling down or angry.",
+    "My quick impressions of what people are feeling are usually wrong.",
+    "My “feelings” vocabulary is probably better than most other person's “feelings” vocabularies.",
+    "I know how to keep calm in difficult or stressful situations.",
+    "I am the type of person to whom others go when they need help with a difficult situation."
+
 ];
 
-// GAD-7 Questions
-const GAD7_QUESTIONS = [
-    "Feeling nervous, anxious, or on edge",
-    "Not being able to stop or control worrying",
-    "Worrying too much about different things",
-    "Trouble relaxing",
-    "Being so restless that it is hard to sit still",
-    "Becoming easily annoyed or irritable",
-    "Feeling afraid as if something awful might happen"
+// SREIS Answers
+const SREIS_answers = [
+    { value: 1, label: "Very inaccurate" },
+    { value: 2, label: "Moderately inaccurate" },
+    { value: 3, label: "Neither nor" },
+    { value: 4, label: "Moderately accurate" },
+    { value: 5, label: "Very accurate" }
 ];
 
-const RATING_SCALE = [
-    { value: 0, label: "Not at all" },
-    { value: 1, label: "Several days" },
-    { value: 2, label: "More than half the days" },
-    { value: 3, label: "Nearly every day" }
+// BDI-II Questions (Beck Depression Inventory) - Full version with 4 statements per question
+const BDI_QUESTIONS = [
+    {
+        category: "Sadness",
+        statements: [
+            "I do not feel sad.",
+            "I feel sad.",
+            "I am sad all the time and I can't snap out of it.",
+            "I am so sad or unhappy that I can't stand it."
+        ]
+    },
+    {
+        category: "Pessimism",
+        statements: [
+            "I am not discouraged about my future.",
+            "I feel more discouraged about my future than I used to be.",
+            "I do not expect things to work out for me.",
+            "I feel my future is hopeless and will only get worse."
+        ]
+    },
+    {
+        category: "Past Failure",
+        statements: [
+            "I do not feel like a failure.",
+            "I have failed more than I should have.",
+            "As I look back, I see a lot of failures.",
+            "I feel I am a complete failure as a person."
+        ]
+    },
+    {
+        category: "Loss of Pleasure",
+        statements: [
+            "I get as much pleasure as I ever did from the things I enjoy.",
+            "I don't enjoy things as much as I used to.",
+            "I get very little pleasure from the things I used to enjoy.",
+            "I can't get any pleasure from the things I used to enjoy."
+        ]
+    },
+    {
+        category: "Guilty Feelings",
+        statements: [
+            "I don't feel particularly guilty.",
+            "I feel guilty over many things I have done or should have done.",
+            "I feel quite guilty most of the time.",
+            "I feel guilty all of the time."
+        ]
+    },
+    {
+        category: "Punishment Feelings",
+        statements: [
+            "I don't feel I am being punished.",
+            "I feel I may be punished.",
+            "I expect to be punished.",
+            "I feel I am being punished."
+        ]
+    },
+    {
+        category: "Self-Dislike",
+        statements: [
+            "I feel the same about myself as ever.",
+            "I have lost confidence in myself.",
+            "I am disappointed in myself.",
+            "I dislike myself."
+        ]
+    },
+    {
+        category: "Self-Criticalness",
+        statements: [
+            "I don't criticize or blame myself more than usual.",
+            "I am more critical of myself than I used to be.",
+            "I criticize myself for all of my faults.",
+            "I blame myself for everything bad that happens."
+        ]
+    },
+    {
+        category: "Suicidal Thoughts or Wishes",
+        statements: [
+            "I don't have any thoughts of killing myself.",
+            "I have thoughts of killing myself, but I would not carry them out.",
+            "I would like to kill myself.",
+            "I would kill myself if I had the chance."
+        ]
+    },
+    {
+        category: "Crying",
+        statements: [
+            "I don't cry any more than usual.",
+            "I cry more than I used to.",
+            "I cry over every little thing.",
+            "I feel like crying, but I can't."
+        ]
+    },
+    {
+        category: "Agitation",
+        statements: [
+            "I am no more restless or wound up than usual.",
+            "I feel more restless than usual.",
+            "I am so restless or agitated that it's hard to stay still.",
+            "I am so restless or agitated that I have to keep moving or doing something."
+        ]
+    },
+    {
+        category: "Loss of Interest",
+        statements: [
+            "I have not lost interest in other people or activities.",
+            "I am less interested in other people or things than before.",
+            "I have lost most of my interest in other people or things.",
+            "It's hard to get interested in anything."
+        ]
+    },
+    {
+        category: "Indecisiveness",
+        statements: [
+            "I make decisions about as well as ever.",
+            "I find it more difficult to make decisions than usual.",
+            "I have much greater difficulty in making decisions than I used to.",
+            "I have trouble making any decisions."
+        ]
+    },
+    {
+        category: "Worthlessness",
+        statements: [
+            "I do not feel I am worthless.",
+            "I don't consider myself as worthwhile and useful as I used to.",
+            "I feel more worthless as compared to other people.",
+            "I feel utterly worthless."
+        ]
+    },
+    {
+        category: "Loss of Energy",
+        statements: [
+            "I have as much energy as ever.",
+            "I have less energy than I used to have.",
+            "I don't have enough energy to do very much.",
+            "I don't have enough energy to do anything."
+        ]
+    },
+    {
+        category: "Changes in Sleeping Pattern",
+        statements: [
+            "I have not experienced any change in my sleeping pattern.",
+            "I sleep somewhat more than usual, or somewhat less than usual.",
+            "I sleep a lot more than usual, or a lot less than usual.",
+            "I sleep most of the day, or I wake up 1-2 hours early and can't get back to sleep."
+        ]
+    },
+    {
+        category: "Irritability",
+        statements: [
+            "I am no more irritable than usual.",
+            "I am more irritable than usual.",
+            "I am much more irritable than usual.",
+            "I am irritable all the time."
+        ]
+    },
+    {
+        category: "Changes in Appetite",
+        statements: [
+            "I have not experienced any change in my appetite.",
+            "My appetite is somewhat less than usual, or somewhat greater than usual.",
+            "My appetite is much less than usual, or much greater than usual.",
+            "I have no appetite at all, or I crave food all the time."
+        ]
+    },
+    {
+        category: "Concentration Difficulty",
+        statements: [
+            "I can concentrate as well as ever.",
+            "I can't concentrate as well as usual.",
+            "It's hard to keep my mind on anything for very long.",
+            "I find I can't concentrate on anything."
+        ]
+    },
+    {
+        category: "Tiredness or Fatigue",
+        statements: [
+            "I am no more tired or fatigued than usual.",
+            "I get more tired or fatigued more easily than usual.",
+            "I am too tired or fatigued to do a lot of the things I used to do.",
+            "I am too tired or fatigued to do most of the things I used to do."
+        ]
+    },
+    {
+        category: "Loss of Interest in Sex",
+        statements: [
+            "I have not noticed any recent change in my interest in sex.",
+            "I am less interested in sex than I used to be.",
+            "I am much less interested in sex now.",
+            "I have lost interest in sex completely."
+        ]
+    }
 ];
 
 // Initialize
 document.addEventListener('DOMContentLoaded', function() {
     loadStimuliConfig();
-    renderPHQ9();
-    renderGAD7();
+    renderSREIS();
+    renderBDI();
     
     // Check URL hash for direct page access
     checkUrlHash();
@@ -67,8 +261,8 @@ function checkUrlHash() {
         const pageMap = {
             'consent': 'consent-page',
             'info': 'info-page',
-            'phq9': 'assessment-phq9-page',
-            'gad7': 'assessment-gad7-page',
+            'SREIS': 'assessment-sreis-page',
+            'bdi': 'assessment-bdi-page',
             'instructions': 'instructions-page',
             'stimuli': 'stimuli-page',
             'thankyou': 'thankyou-page'
@@ -84,6 +278,8 @@ function checkUrlHash() {
             const targetPage = document.getElementById(pageId);
             if (targetPage) {
                 targetPage.classList.add('active');
+                // Scroll to top of page
+                window.scrollTo(0, 0);
             }
         }
     }
@@ -95,6 +291,8 @@ function nextPage(currentPageId, nextPageId) {
     document.getElementById(nextPageId).classList.add('active');
     // Update URL hash for direct page access
     window.location.hash = nextPageId.replace('-page', '');
+    // Scroll to top of page
+    window.scrollTo(0, 0);
 }
 
 // Info page submission
@@ -109,24 +307,24 @@ function submitInfo() {
             gender: formData.get('gender'),
             timestamp: new Date().toISOString()
         };
-        nextPage('info-page', 'assessment-phq9-page');
+        nextPage('info-page', 'assessment-sreis-page');
     } else {
         form.reportValidity();
     }
 }
 
 // Assessment rendering and submission
-function renderPHQ9() {
-    const container = document.getElementById('phq9-questions');
-    PHQ9_QUESTIONS.forEach((question, index) => {
+function renderSREIS() {
+    const container = document.getElementById('sreis-questions');
+    SREIS_QUESTIONS.forEach((question, index) => {
         const questionDiv = document.createElement('div');
         questionDiv.className = 'question-item';
         questionDiv.innerHTML = `
             <label>${index + 1}. ${question}</label>
             <div class="rating-scale">
-                ${RATING_SCALE.map((option, optIndex) => `
+                ${SREIS_answers.map((option, optIndex) => `
                     <label class="rating-option">
-                        <input type="radio" name="phq9_q${index}" value="${option.value}" required>
+                        <input type="radio" name="sreis_q${index}" value="${option.value}" required>
                         <span>${option.value}</span>
                         <span>${option.label}</span>
                     </label>
@@ -146,19 +344,19 @@ function renderPHQ9() {
     });
 }
 
-function renderGAD7() {
-    const container = document.getElementById('gad7-questions');
-    GAD7_QUESTIONS.forEach((question, index) => {
+function renderBDI() {
+    const container = document.getElementById('bdi-questions');
+    BDI_QUESTIONS.forEach((question, index) => {
         const questionDiv = document.createElement('div');
         questionDiv.className = 'question-item';
         questionDiv.innerHTML = `
-            <label>${index + 1}. ${question}</label>
-            <div class="rating-scale">
-                ${RATING_SCALE.map((option, optIndex) => `
-                    <label class="rating-option">
-                        <input type="radio" name="gad7_q${index}" value="${option.value}" required>
-                        <span>${option.value}</span>
-                        <span>${option.label}</span>
+            <label class="question-category">${index + 1}. ${question.category}</label>
+            <div class="bdi-statements">
+                ${question.statements.map((statement, stmtIndex) => `
+                    <label class="rating-option bdi-statement">
+                        <input type="radio" name="bdi_q${index}" value="${stmtIndex}" required>
+                        <span class="statement-number">${stmtIndex}</span>
+                        <span class="statement-text">${statement}</span>
                     </label>
                 `).join('')}
             </div>
@@ -169,8 +367,10 @@ function renderGAD7() {
     // Add click handlers for radio buttons
     container.querySelectorAll('input[type="radio"]').forEach(radio => {
         radio.addEventListener('change', function() {
-            const parent = this.closest('.rating-option');
-            parent.parentElement.querySelectorAll('.rating-option').forEach(opt => opt.classList.remove('selected'));
+            const parent = this.closest('.bdi-statement');
+            // Remove selected class from all options in this question group
+            const questionItem = parent.closest('.question-item');
+            questionItem.querySelectorAll('.bdi-statement').forEach(opt => opt.classList.remove('selected'));
             parent.classList.add('selected');
         });
     });
@@ -832,38 +1032,38 @@ function saveAssessmentsExcel(participantId) {
         const wb = XLSX.utils.book_new();
         
         // Debug: Check what data we have
-        console.log('PHQ9 data:', participantData.phq9);
-        console.log('GAD7 data:', participantData.gad7);
+        console.log('SREIS data:', participantData.sreis);
+        console.log('BDI data:', participantData.bdi);
         
-        // PHQ-9 Sheet
-        const phq9Data = [
+        // SREIS Sheet
+        const sreisData = [
             ['Question', 'Score'],
-            ...PHQ9_QUESTIONS.map((q, i) => {
-                const key = `phq9_q${i}`;
-                const value = participantData.phq9 && participantData.phq9[key] !== undefined 
-                    ? participantData.phq9[key] 
+            ...SREIS_QUESTIONS.map((q, i) => {
+                const key = `sreis_q${i}`;
+                const value = participantData.sreis && participantData.sreis[key] !== undefined 
+                    ? participantData.sreis[key] 
                     : 0;
-                console.log(`PHQ9 Q${i+1}: key="${key}", value=${value}`);
+                console.log(`SREIS Q${i+1}: key="${key}", value=${value}`);
                 return [`Q${i + 1}: ${q}`, value];
             })
         ];
-        const phq9WS = XLSX.utils.aoa_to_sheet(phq9Data);
-        XLSX.utils.book_append_sheet(wb, phq9WS, 'PHQ9');
+        const sreisWS = XLSX.utils.aoa_to_sheet(sreisData);
+        XLSX.utils.book_append_sheet(wb, sreisWS, 'SREIS');
         
-        // GAD-7 Sheet
-        const gad7Data = [
+        // BDI Sheet
+        const bdiData = [
             ['Question', 'Score'],
-            ...GAD7_QUESTIONS.map((q, i) => {
-                const key = `gad7_q${i}`;
-                const value = participantData.gad7 && participantData.gad7[key] !== undefined 
-                    ? participantData.gad7[key] 
+            ...BDI_QUESTIONS.map((q, i) => {
+                const key = `bdi_q${i}`;
+                const value = participantData.bdi && participantData.bdi[key] !== undefined 
+                    ? participantData.bdi[key] 
                     : 0;
-                console.log(`GAD7 Q${i+1}: key="${key}", value=${value}`);
-                return [`Q${i + 1}: ${q}`, value];
+                console.log(`BDI Q${i+1}: key="${key}", value=${value}`);
+                return [`Q${i + 1}: ${q.category}`, value];
             })
         ];
-        const gad7WS = XLSX.utils.aoa_to_sheet(gad7Data);
-        XLSX.utils.book_append_sheet(wb, gad7WS, 'GAD7');
+        const bdiWS = XLSX.utils.aoa_to_sheet(bdiData);
+        XLSX.utils.book_append_sheet(wb, bdiWS, 'BDI');
         
         const excelBlob = XLSX.write(wb, { type: 'array', bookType: 'xlsx' });
         console.log(`Downloading assessment Excel for ${participantId}...`);

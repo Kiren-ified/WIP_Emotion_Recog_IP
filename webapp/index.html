@@ -64,27 +64,31 @@
         </div>
     </div>
 
-    <!-- Assessment Page - PHQ9 -->
-    <div id="assessment-phq9-page" class="page">
+    <!-- Assessment Page - SREIS -->
+    <div id="assessment-sreis-page" class="page">
         <div class="container">
-            <h1>PHQ-9 Depression Assessment</h1>
-            <p class="instructions">Over the last 2 weeks, how often have you been bothered by any of the following problems?</p>
-            <form id="phq9-form">
-                <div id="phq9-questions"></div>
+            <h1>SREIS Emotional Intelligence Scale</h1>
+            <p class="instructions">The following set of items pertains to your insight into emotions. Please use the rating scale below to describe
+                how accurately each statement describes you. Describe yourself as you generally are now, not as you wish to
+                be in the future. Describe yourself as you honestly see yourself, in relation to other people you know of the
+                same sex as you are, and roughly your same age. Please read each statement carefully, and then write the letter
+                that corresponds to how inaccurately or accurately each statement describes you.</p>
+            <form id="sreis-form">
+                <div id="sreis-questions"></div>
             </form>
-            <button class="btn-primary" onclick="submitAssessment('phq9', 'assessment-gad7-page')">Continue</button>
+            <button class="btn-primary" onclick="submitAssessment('sreis', 'assessment-bdi-page')">Continue</button>
         </div>
     </div>
 
-    <!-- Assessment Page - GAD7 -->
-    <div id="assessment-gad7-page" class="page">
+    <!-- Assessment Page - BDI -->
+    <div id="assessment-bdi-page" class="page">
         <div class="container">
-            <h1>GAD-7 Anxiety Assessment</h1>
-            <p class="instructions">Over the last 2 weeks, how often have you been bothered by the following problems?</p>
-            <form id="gad7-form">
-                <div id="gad7-questions"></div>
+            <h1>Beck Depression Inventory (BDI-II)</h1>
+            <p class="instructions">This questionnaire consists of 21 groups of statements. Please read each group of statements carefully, and then pick out the one statement in each group that best describes the way you have been feeling during the past two weeks, including today. Circle or select the number beside the statement you picked. If several statements in the group seem to apply equally well, circle the highest number for that group.</p>
+            <form id="bdi-form">
+                <div id="bdi-questions"></div>
             </form>
-            <button class="btn-primary" onclick="submitAssessment('gad7', 'instructions-page')">Continue</button>
+            <button class="btn-primary" onclick="submitAssessment('bdi', 'instructions-page')">Continue</button>
         </div>
     </div>
 
