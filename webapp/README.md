@@ -4,7 +4,6 @@ A local web application for conducting emotion recognition experiments with vide
 
 ## Features
 
-- **Consent Page**: Participant consent for emotion recognition study
 - **Info Page**: Collect basic participant information (ID, performer status, age, gender)
 - **Assessment Pages**: PHQ-9 and GAD-7 depression and anxiety assessments
 - **Instructions Page**: Experiment instructions with camera permission request

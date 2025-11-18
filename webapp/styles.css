@@ -286,3 +286,154 @@ h1 {
     line-height: 1.5;
 }
 
+/* DES-II Slider Styles */
+.des2-question {
+    margin-bottom: 35px;
+}
+
+.des2-slider-container {
+    margin-top: 20px;
+}
+
+.des2-slider-wrapper {
+    position: relative;
+    margin-bottom: 20px;
+}
+
+.des2-slider {
+    width: 100%;
+    height: 8px;
+    border-radius: 5px;
+    background: linear-gradient(to right, #764ba2 0%, #764ba2 var(--value, 0%), #e0e0e0 var(--value, 0%), #e0e0e0 100%);
+    outline: none;
+    -webkit-appearance: none;
+    appearance: none;
+    cursor: pointer;
+    position: relative;
+    margin: 15px 0;
+}
+
+/* Slider Track - Webkit browsers (Chrome, Safari, Edge) */
+.des2-slider::-webkit-slider-runnable-track {
+    width: 100%;
+    height: 8px;
+    border-radius: 5px;
+    background: transparent;
+    position: relative;
+}
+
+/* Slider Track - Firefox */
+.des2-slider::-moz-range-track {
+    width: 100%;
+    height: 8px;
+    border-radius: 5px;
+    background: #e0e0e0;
+    border: none;
+}
+
+/* Firefox filled track - automatically fills based on value */
+.des2-slider::-moz-range-progress {
+    height: 8px;
+    border-radius: 5px;
+    background: #764ba2;
+}
+
+/* Slider Thumb (Purple Dot) - Webkit */
+.des2-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: #764ba2;
+    cursor: pointer;
+    border: 3px solid white;
+    box-shadow: 0 2px 6px rgba(118, 75, 162, 0.4);
+    margin-top: -8px;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.des2-slider::-webkit-slider-thumb:hover {
+    transform: scale(1.1);
+    box-shadow: 0 3px 8px rgba(118, 75, 162, 0.6);
+}
+
+.des2-slider::-webkit-slider-thumb:active {
+    transform: scale(1.15);
+    box-shadow: 0 4px 10px rgba(118, 75, 162, 0.8);
+}
+
+/* Slider Thumb (Purple Dot) - Firefox */
+.des2-slider::-moz-range-thumb {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: #764ba2;
+    cursor: pointer;
+    border: 3px solid white;
+    box-shadow: 0 2px 6px rgba(118, 75, 162, 0.4);
+    transition: transform 0.2s, box-shadow 0.2s;
+    -moz-appearance: none;
+    appearance: none;
+}
+
+.des2-slider::-moz-range-thumb:hover {
+    transform: scale(1.1);
+    box-shadow: 0 3px 8px rgba(118, 75, 162, 0.6);
+}
+
+.des2-slider::-moz-range-thumb:active {
+    transform: scale(1.15);
+    box-shadow: 0 4px 10px rgba(118, 75, 162, 0.8);
+}
+
+/* Slider Labels (0% and 100%) */
+.des2-slider-labels {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 8px;
+    font-size: 12px;
+    color: #666;
+}
+
+.slider-label-left,
+.slider-label-right {
+    font-weight: 500;
+}
+
+/* Percentage Display Below Slider */
+.des2-percentage-display {
+    text-align: center;
+    font-size: 28px;
+    font-weight: 600;
+    color: #764ba2;
+    margin-top: 15px;
+    min-height: 35px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    position: relative;
+}
+
+/* Arrow pointing up to slider */
+.des2-percentage-display::before {
+    content: '';
+    display: block;
+    width: 0;
+    height: 0;
+    border-left: 10px solid transparent;
+    border-right: 10px solid transparent;
+    border-bottom: 10px solid #764ba2;
+    position: absolute;
+    top: -20px;
+    left: 50%;
+    transform: translateX(-50%);
+    opacity: 0;
+    transition: opacity 0.2s;
+}
+
+.des2-percentage-display.has-value::before {
+    opacity: 1;
+}
+

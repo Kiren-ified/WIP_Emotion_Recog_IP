@@ -5,8 +5,10 @@ let participantData = {
     sreis: {},
     sbc: {},
     bdi: {},
+    bai: {},
     dsm5: {},
     des2: {},
+    edeqs: {},
     stimuli: [],
     startTime: null
 };
@@ -57,7 +59,7 @@ const SBC_QUESTIONS = [
     "I notice that my breathing becomes shallow when I am nervous.",
     "I notice my emotional response to caring touch.",
     "My body feels frozen, as though numb, during uncomfortble situations.",
-    "I notice how mmy body changes when I am angry.",
+    "I notice how my body changes when I am angry.",
     "I feel like I am looking at my body from outside of my body.",
     "I am aware of internal sensation during sexual activity.",
     "I can feel my breath travel through my body when I exhale deeply.",
@@ -233,6 +235,30 @@ const DES2_RATING_SCALE = [
     { value: 8, label: "80%" },
     { value: 9, label: "90%" },
     { value: 10, label: "100% (Always)" }
+];
+
+// EDE-QS (Eating Disorder Examination Questionnaire - Short) Questions - 12 items
+const EDEQS_QUESTIONS = [
+    "Have you been deliberately trying to limit the amount of food you eat to influence your shape or weight (whether or not you have succeeded)?",
+    "Have you gone for long periods of time (e.g., 8 hours or more) without eating anything in order to influence your shape or weight?",
+    "Have you had a definite fear of losing control over eating?",
+    "Have you had a definite desire to have an empty stomach with the aim of influencing your shape or weight?",
+    "Have you had a definite desire to lose weight?",
+    "Have you felt fat?",
+    "Have you had a definite fear that you might gain weight?",
+    "Have you felt dissatisfied with your weight?",
+    "Have you felt dissatisfied with your shape?",
+    "Have you been deliberately trying to avoid foods you like in order to influence your shape or weight?",
+    "Have you been afraid of losing control over eating?",
+    "Have you had a definite desire to have a totally flat stomach?"
+];
+
+// EDE-QS Rating Scale (0-3, representing days in past 7 days)
+const EDEQS_RATING_SCALE = [
+    { value: 0, label: "No days (0 days)" },
+    { value: 1, label: "1-2 days" },
+    { value: 2, label: "3-5 days" },
+    { value: 3, label: "6-7 days" }
 ];
 
 // BDI-II Questions (Beck Depression Inventory) - Full version with 4 statements per question
@@ -428,14 +454,49 @@ const BDI_QUESTIONS = [
     }
 ];
 
+// BAI (Beck Anxiety Inventory) Questions - 21 items
+const BAI_QUESTIONS = [
+    "Numbness or tingling",
+    "Feeling hot",
+    "Wobbliness in legs",
+    "Unable to relax",
+    "Fear of the worst happening",
+    "Dizzy or lightheaded",
+    "Heart pounding or racing",
+    "Unsteady",
+    "Terrified or afraid",
+    "Nervous",
+    "Feeling of choking",
+    "Hands trembling",
+    "Shaky / unsteady",
+    "Fear of losing control",
+    "Difficulty breathing",
+    "Fear of dying",
+    "Scared",
+    "Indigestion",
+    "Faint / lightheaded",
+    "Face flushed",
+    "Hot/cold sweats"
+];
+
+// BAI Rating Scale (0-3)
+const BAI_RATING_SCALE = [
+    { value: 0, label: "Not at all" },
+    { value: 1, label: "Mildly, but it didn't bother me much" },
+    { value: 2, label: "Moderately, it wasn't pleasant at times" },
+    { value: 3, label: "Severely, it bothered me a lot" }
+];
+
 // Initialize
 document.addEventListener('DOMContentLoaded', function() {
     loadStimuliConfig();
     renderSREIS();
     renderSBC();
     renderBDI();
+    renderBAI();
     renderDSM5();
     renderDES2();
+    renderEDEQS();
     
     // Check URL hash for direct page access
     checkUrlHash();
@@ -450,13 +511,14 @@ function checkUrlHash() {
     if (hash) {
         // Map hash to page ID
         const pageMap = {
-            'consent': 'consent-page',
             'info': 'info-page',
             'SREIS': 'assessment-sreis-page',
             'sbc': 'assessment-sbc-page',
             'bdi': 'assessment-bdi-page',
+            'bai': 'assessment-bai-page',
             'dsm5': 'assessment-dsm5-page',
             'des2': 'assessment-des2-page',
+            'edeqs': 'assessment-edeqs-page',
             'instructions': 'instructions-page',
             'stimuli': 'stimuli-page',
             'thankyou': 'thankyou-page'
@@ -518,7 +580,7 @@ function renderSREIS() {
             <div class="rating-scale">
                 ${SREIS_answers.map((option, optIndex) => `
                     <label class="rating-option">
-                        <input type="radio" name="sreis_q${index}" value="${option.value}" required>
+                        <input type="radio" name="sreis_q${index}" value="${option.value}">
                         <span>${option.value}</span>
                         <span>${option.label}</span>
                     </label>
@@ -548,7 +610,7 @@ function renderSBC() {
             <div class="rating-scale">
                 ${SBC_RATING_SCALE.map((option, optIndex) => `
                     <label class="rating-option">
-                        <input type="radio" name="sbc_q${index}" value="${option.value}" required>
+                        <input type="radio" name="sbc_q${index}" value="${option.value}">
                         <span>${option.value}</span>
                         <span>${option.label}</span>
                     </label>
@@ -578,7 +640,7 @@ function renderBDI() {
             <div class="bdi-statements">
                 ${question.statements.map((statement, stmtIndex) => `
                     <label class="rating-option bdi-statement">
-                        <input type="radio" name="bdi_q${index}" value="${stmtIndex}" required>
+                        <input type="radio" name="bdi_q${index}" value="${stmtIndex}">
                         <span class="statement-number">${stmtIndex}</span>
                         <span class="statement-text">${statement}</span>
                     </label>
@@ -600,6 +662,36 @@ function renderBDI() {
     });
 }
 
+function renderBAI() {
+    const container = document.getElementById('bai-questions');
+    BAI_QUESTIONS.forEach((question, index) => {
+        const questionDiv = document.createElement('div');
+        questionDiv.className = 'question-item';
+        questionDiv.innerHTML = `
+            <label>${index + 1}. ${question}</label>
+            <div class="rating-scale">
+                ${BAI_RATING_SCALE.map((option, optIndex) => `
+                    <label class="rating-option">
+                        <input type="radio" name="bai_q${index}" value="${option.value}">
+                        <span>${option.value}</span>
+                        <span>${option.label}</span>
+                    </label>
+                `).join('')}
+            </div>
+        `;
+        container.appendChild(questionDiv);
+    });
+
+    // Add click handlers for radio buttons
+    container.querySelectorAll('input[type="radio"]').forEach(radio => {
+        radio.addEventListener('change', function() {
+            const parent = this.closest('.rating-option');
+            parent.parentElement.querySelectorAll('.rating-option').forEach(opt => opt.classList.remove('selected'));
+            parent.classList.add('selected');
+        });
+    });
+}
+
 function renderDSM5() {
     const container = document.getElementById('dsm5-questions');
     DSM5_QUESTIONS.forEach((item, index) => {
@@ -610,7 +702,7 @@ function renderDSM5() {
             <div class="rating-scale">
                 ${DSM5_RATING_SCALE.map((option, optIndex) => `
                     <label class="rating-option">
-                        <input type="radio" name="dsm5_q${index}" value="${option.value}" required>
+                        <input type="radio" name="dsm5_q${index}" value="${option.value}">
                         <span>${option.value}</span>
                         <span>${option.label}</span>
                     </label>
@@ -634,14 +726,67 @@ function renderDES2() {
     const container = document.getElementById('des2-questions');
     DES2_QUESTIONS.forEach((question, index) => {
         const questionDiv = document.createElement('div');
+        questionDiv.className = 'question-item des2-question';
+        questionDiv.innerHTML = `
+            <label>${index + 1}. ${question}</label>
+            <div class="des2-slider-container">
+                <div class="des2-slider-wrapper">
+                    <input type="range" 
+                           name="des2_q${index}" 
+                           id="des2_slider_${index}" 
+                           min="0" 
+                           max="10" 
+                           value="0" 
+                           step="1" 
+                           class="des2-slider">
+                    <div class="des2-slider-labels">
+                        <span class="slider-label-left">0%</span>
+                        <span class="slider-label-right">100%</span>
+                    </div>
+                </div>
+                <div class="des2-percentage-display" id="des2_percentage_${index}">0%</div>
+            </div>
+        `;
+        container.appendChild(questionDiv);
+        
+        // Add event listener to update percentage display
+        const slider = document.getElementById(`des2_slider_${index}`);
+        const percentageDisplay = document.getElementById(`des2_percentage_${index}`);
+        
+        slider.addEventListener('input', function() {
+            const value = parseInt(this.value);
+            const percentage = value * 10;
+            percentageDisplay.textContent = `${percentage}%`;
+            
+            // Update slider filled portion for visual feedback (Webkit browsers)
+            const percentageValue = (value / 10) * 100;
+            this.style.setProperty('--value', `${percentageValue}%`);
+            
+            // Show/hide arrow indicator
+            if (value > 0) {
+                percentageDisplay.classList.add('has-value');
+            } else {
+                percentageDisplay.classList.remove('has-value');
+            }
+        });
+        
+        // Initialize the display and slider state
+        slider.style.setProperty('--value', '0%');
+    });
+}
+
+function renderEDEQS() {
+    const container = document.getElementById('edeqs-questions');
+    EDEQS_QUESTIONS.forEach((question, index) => {
+        const questionDiv = document.createElement('div');
         questionDiv.className = 'question-item';
         questionDiv.innerHTML = `
             <label>${index + 1}. ${question}</label>
             <div class="rating-scale">
-                ${DES2_RATING_SCALE.map((option, optIndex) => `
+                ${EDEQS_RATING_SCALE.map((option, optIndex) => `
                     <label class="rating-option">
-                        <input type="radio" name="des2_q${index}" value="${option.value}" required>
-                        <span>${option.value * 10}%</span>
+                        <input type="radio" name="edeqs_q${index}" value="${option.value}">
+                        <span>${option.value}</span>
                         <span>${option.label}</span>
                     </label>
                 `).join('')}
@@ -662,19 +807,29 @@ function renderDES2() {
 
 function submitAssessment(type, nextPageId) {
     const form = document.getElementById(`${type}-form`);
-    if (form.checkValidity()) {
-        const formData = new FormData(form);
-        const answers = {};
-        
-        // Collect all radio button values
-        formData.forEach((value, key) => {
-            const numValue = parseInt(value, 10);
-            if (!isNaN(numValue)) {
-                answers[key] = numValue;
+    // Bypass validation - allow proceeding without answering all questions
+    const formData = new FormData(form);
+    const answers = {};
+    
+    // Collect all form values (handles both radio buttons and sliders)
+    formData.forEach((value, key) => {
+        const numValue = parseInt(value, 10);
+        if (!isNaN(numValue)) {
+            answers[key] = numValue;
+        }
+    });
+    
+    // For DES-II, also collect directly from sliders
+    if (type === 'des2') {
+        const allSliders = form.querySelectorAll('input[type="range"]');
+        allSliders.forEach(slider => {
+            const numValue = parseInt(slider.value, 10);
+            if (!isNaN(numValue) && !answers[slider.name]) {
+                answers[slider.name] = numValue;
             }
         });
-        
-        // Double-check: Also collect directly from radio buttons as fallback
+    } else {
+        // For other assessments, collect from radio buttons as fallback
         const allRadios = form.querySelectorAll('input[type="radio"]:checked');
         allRadios.forEach(radio => {
             const numValue = parseInt(radio.value, 10);
@@ -682,14 +837,12 @@ function submitAssessment(type, nextPageId) {
                 answers[radio.name] = numValue;
             }
         });
-        
-        participantData[type] = answers;
-        console.log(`${type} assessment data:`, answers); // Debug log
-        console.log(`Total questions answered: ${Object.keys(answers).length}`);
-        nextPage(`assessment-${type}-page`, nextPageId);
-    } else {
-        form.reportValidity();
     }
+    
+    participantData[type] = answers;
+    console.log(`${type} assessment data:`, answers); // Debug log
+    console.log(`Total questions answered: ${Object.keys(answers).length}`);
+    nextPage(`assessment-${type}-page`, nextPageId);
 }
 
 // Camera permission
@@ -1319,8 +1472,10 @@ function saveAssessmentsExcel(participantId) {
         console.log('SREIS data:', participantData.sreis);
         console.log('SBC data:', participantData.sbc);
         console.log('BDI data:', participantData.bdi);
+        console.log('BAI data:', participantData.bai);
         console.log('DSM-5 data:', participantData.dsm5);
         console.log('DES-II data:', participantData.des2);
+        console.log('EDE-QS data:', participantData.edeqs);
         
         // SREIS Sheet
         const sreisData = [
@@ -1367,6 +1522,21 @@ function saveAssessmentsExcel(participantId) {
         const bdiWS = XLSX.utils.aoa_to_sheet(bdiData);
         XLSX.utils.book_append_sheet(wb, bdiWS, 'BDI');
         
+        // BAI Sheet
+        const baiData = [
+            ['Question', 'Score'],
+            ...BAI_QUESTIONS.map((q, i) => {
+                const key = `bai_q${i}`;
+                const value = participantData.bai && participantData.bai[key] !== undefined 
+                    ? participantData.bai[key] 
+                    : 0;
+                console.log(`BAI Q${i+1}: key="${key}", value=${value}`);
+                return [`Q${i + 1}: ${q}`, value];
+            })
+        ];
+        const baiWS = XLSX.utils.aoa_to_sheet(baiData);
+        XLSX.utils.book_append_sheet(wb, baiWS, 'BAI');
+        
         // DSM-5 Sheet
         const dsm5Data = [
             ['Domain', 'Question', 'Score'],
@@ -1396,6 +1566,21 @@ function saveAssessmentsExcel(participantId) {
         ];
         const des2WS = XLSX.utils.aoa_to_sheet(des2Data);
         XLSX.utils.book_append_sheet(wb, des2WS, 'DES-II');
+        
+        // EDE-QS Sheet
+        const edeqsData = [
+            ['Question', 'Score (0-3, representing days in past 7 days)'],
+            ...EDEQS_QUESTIONS.map((q, i) => {
+                const key = `edeqs_q${i}`;
+                const value = participantData.edeqs && participantData.edeqs[key] !== undefined 
+                    ? participantData.edeqs[key] 
+                    : 0;
+                console.log(`EDE-QS Q${i+1}: key="${key}", value=${value}`);
+                return [`Q${i + 1}: ${q}`, value];
+            })
+        ];
+        const edeqsWS = XLSX.utils.aoa_to_sheet(edeqsData);
+        XLSX.utils.book_append_sheet(wb, edeqsWS, 'EDE-QS');
         
         const excelBlob = XLSX.write(wb, { type: 'array', bookType: 'xlsx' });
         console.log(`Downloading assessment Excel for ${participantId}...`);

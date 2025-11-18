@@ -8,28 +8,8 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 </head>
 <body>
-    <!-- Consent Page -->
-    <div id="consent-page" class="page active">
-        <div class="container">
-            <h1>Research Study Consent</h1>
-            <div class="consent-text">
-                <p>You are being invited to participate in an emotion recognition research study. This study aims to understand how individuals perceive and identify emotions in visual stimuli.</p>
-                <p><strong>What you need to know:</strong></p>
-                <ul>
-                    <li>This experiment involves viewing images and identifying emotions</li>
-                    <li>Your video will be recorded during the stimulus presentation phase</li>
-                    <li>Your participation is voluntary and you can withdraw at any time</li>
-                    <li>All data will be stored locally on this device</li>
-                    <li>Your responses and video recording will be used solely for research purposes</li>
-                </ul>
-                <p>By clicking "I Consent" below, you acknowledge that you have read and understood this information and agree to participate in this study.</p>
-            </div>
-            <button class="btn-primary" onclick="nextPage('consent-page', 'info-page')">I Consent</button>
-        </div>
-    </div>
-
     <!-- Info Page -->
-    <div id="info-page" class="page">
+    <div id="info-page" class="page active">
         <div class="container">
             <h1>Participant Information</h1>
             <form id="info-form">
@@ -103,7 +83,19 @@
             <form id="bdi-form">
                 <div id="bdi-questions"></div>
             </form>
-            <button class="btn-primary" onclick="submitAssessment('bdi', 'assessment-dsm5-page')">Continue</button>
+            <button class="btn-primary" onclick="submitAssessment('bdi', 'assessment-bai-page')">Continue</button>
+        </div>
+    </div>
+
+    <!-- Assessment Page - BAI -->
+    <div id="assessment-bai-page" class="page">
+        <div class="container">
+            <h1>Beck Anxiety Inventory (BAI)</h1>
+            <p class="instructions">Below is a list of common symptoms of anxiety. Please carefully read each item in the list. Indicate how much you have been bothered by that symptom during the past month, including today, by circling the number in the corresponding space in the column next to each symptom.</p>
+            <form id="bai-form">
+                <div id="bai-questions"></div>
+            </form>
+            <button class="btn-primary" onclick="submitAssessment('bai', 'assessment-dsm5-page')">Continue</button>
         </div>
     </div>
 
@@ -127,7 +119,19 @@
             <form id="des2-form">
                 <div id="des2-questions"></div>
             </form>
-            <button class="btn-primary" onclick="submitAssessment('des2', 'instructions-page')">Continue</button>
+            <button class="btn-primary" onclick="submitAssessment('des2', 'assessment-edeqs-page')">Continue</button>
+        </div>
+    </div>
+
+    <!-- Assessment Page - EDE-QS -->
+    <div id="assessment-edeqs-page" class="page">
+        <div class="container">
+            <h1>Eating Disorder Examination Questionnaire - Short (EDE-QS)</h1>
+            <p class="instructions">The following questions ask about your eating behaviors and attitudes over the past 7 days (including today). Please read each question carefully and select the response that best describes how many days in the past week you have experienced each item.</p>
+            <form id="edeqs-form">
+                <div id="edeqs-questions"></div>
+            </form>
+            <button class="btn-primary" onclick="submitAssessment('edeqs', 'instructions-page')">Continue</button>
         </div>
     </div>
 
