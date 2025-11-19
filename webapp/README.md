@@ -1,17 +1,26 @@
 # Emotion Recognition Experiment WebApp
 
-A local web application for conducting emotion recognition experiments with video recording and data collection.
+A local web application for conducting emotion recognition experiment with video recording and data collection. This experiment investigates the role of the body in the process of emotion recognition.
 
 ## Features
 
 - **Info Page**: Collect basic participant information (ID, age, gender)
-- **Assessment Pages**: PHQ-9 and GAD-7 depression and anxiety assessments
+- **Introduction Page**: Welcome message and experiment overview
+- **Assessment Pages**: Comprehensive mental health and psychological assessments
+  - SREIS (Emotional Intelligence Scale)
+  - SBC (Scale of Body Connection)
+  - DSM-5-TR Level 1 Cross-Cutting Symptom Measure
+  - BDI-II (Beck Depression Inventory)
+  - BAI (Beck Anxiety Inventory)
+  - DES-II (Dissociative Experiences Scale)
+  - EDE-QS (Eating Disorder Examination Questionnaire - Short)
 - **Instructions Page**: Experiment instructions with camera permission request
 - **Stimuli Page**: Image presentation with emotion recognition task
   - Images shown for 1 second each
   - Click-based emotion selection
   - Reaction time tracking
   - Accuracy calculation
+  - Video recording of facial expressions
 - **Thank You Page**: Completion page with contact information
 
 ## Setup Instructions
@@ -70,7 +79,15 @@ sad1.jpg,Happy,Sad,Angry,Neutral,option2
 
 For each participant, the following files are automatically downloaded:
 
-1. **`{participantId}_assessment.xlsx`**: Contains PHQ-9 and GAD-7 responses
+1. **`{participantId}_assessment.xlsx`**: Contains all assessment responses organized by sheet:
+   - Participant Info
+   - SREIS responses
+   - SBC responses
+   - DSM-5-TR responses
+   - BDI-II responses
+   - BAI responses
+   - DES-II responses
+   - EDE-QS responses (with scale type indicators)
 2. **`{participantId}_metadata.xlsx`**: Contains participant info and experiment results (accuracy, reaction times)
 3. **`{participantId}_video.webm`**: Video recording of participant during experiment (WebM format)
 
@@ -84,12 +101,29 @@ For each participant, the following files are automatically downloaded:
   - Camera API (getUserMedia)
   - File downloads
 
+## Assessment Details
+
+### Assessment Order
+1. SREIS (Emotional Intelligence Scale)
+2. SBC (Scale of Body Connection)
+3. DSM-5-TR Level 1 Cross-Cutting Symptom Measure
+4. BDI-II (Beck Depression Inventory)
+5. BAI (Beck Anxiety Inventory)
+6. DES-II (Dissociative Experiences Scale)
+7. EDE-QS (Eating Disorder Examination Questionnaire - Short)
+
+### EDE-QS Special Notes
+- Questions 1-10 use a "days in past 7 days" scale (0-3: 0 days, 1-2 days, 3-5 days, 6-7 days)
+- Questions 11-12 use a severity scale (0-3: Not at all, Slightly, Moderately, Markedly)
+- An instruction line "Over the past 7 days..." appears between questions 10 and 11
+
 ## Troubleshooting
 
-1. **Camera not working**: Make sure you grant camera permissions when prompted
+1. **Camera not working**: Make sure you click "Grant Camera Permission" button on the instructions page
 2. **Images not loading**: Verify image files are in the `images/` folder and match names in `stimuli.csv`
 3. **CSV not loading**: Ensure `stimuli.csv` is in the same directory as `index.html` and you're running the server from the `webapp/` directory
 4. **Video recording issues**: Some browsers may have limitations. Chrome typically has the best support.
+5. **Assessment navigation**: If you need to restart, refresh the page and start from the info page
 
 ## Important Notes
 
@@ -105,6 +139,7 @@ For each participant, the following files are automatically downloaded:
   # Then open: http://localhost:8000
   ```
 - Browser security requires HTTPS or localhost for camera access
+- The experiment is anonymous - video recordings are not linked to personal information
 
 ## Python Analysis Environment
 
