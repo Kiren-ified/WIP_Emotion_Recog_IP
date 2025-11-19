@@ -241,24 +241,32 @@ const DES2_RATING_SCALE = [
 const EDEQS_QUESTIONS = [
     "Have you been deliberately trying to limit the amount of food you eat to influence your shape or weight (whether or not you have succeeded)?",
     "Have you gone for long periods of time (e.g., 8 hours or more) without eating anything in order to influence your shape or weight?",
-    "Have you had a definite fear of losing control over eating?",
-    "Have you had a definite desire to have an empty stomach with the aim of influencing your shape or weight?",
-    "Have you had a definite desire to lose weight?",
-    "Have you felt fat?",
+    "Has thinking about food, eating or calories made it very difficult to concentrate on things you are interested in (such as working, following a conversation or reading)?",
+    "Has thinking about your weight or shape made it very difficult to concentrate on things you are interested in (such as working, following a conversation or reading)?",
     "Have you had a definite fear that you might gain weight?",
-    "Have you felt dissatisfied with your weight?",
-    "Have you felt dissatisfied with your shape?",
-    "Have you been deliberately trying to avoid foods you like in order to influence your shape or weight?",
-    "Have you been afraid of losing control over eating?",
-    "Have you had a definite desire to have a totally flat stomach?"
+    "Have you had a strong desire to lose weight?",
+    "Have you tried to control your weight or shape by making yourself sick (vomit) or taking laxatives?",
+    "Have you exercised in a driven or compulsive way as a means of controlling your weight, shape or body fat, or to burn off calories?",
+    "Have you had a sense of having lost control over your eating (at the time that you were eating)?",
+    "On how many of these days ( i.e. days on which you had a sense of having lost control over your eating) did you eat what other people would regard as an unusually large amount of food in one go?",
+    "Has your weight or shape influenced how you think about (judge) yourself as a person?",
+    "How dissatisfied have you been with your weight or shape?"
 ];
 
 // EDE-QS Rating Scale (0-3, representing days in past 7 days)
 const EDEQS_RATING_SCALE = [
-    { value: 0, label: "No days (0 days)" },
+    { value: 0, label: "0 days" },
     { value: 1, label: "1-2 days" },
     { value: 2, label: "3-5 days" },
     { value: 3, label: "6-7 days" }
+];
+
+// EDE-QS Rating Scale for last 2 questions (0-3, severity scale)
+const EDEQS_SEVERITY_SCALE = [
+    { value: 0, label: "Not at all" },
+    { value: 1, label: "Slightly" },
+    { value: 2, label: "Moderately" },
+    { value: 3, label: "Markedly" }
 ];
 
 // BDI-II Questions (Beck Depression Inventory) - Full version with 4 statements per question
@@ -558,7 +566,6 @@ function submitInfo() {
         const formData = new FormData(form);
         participantData.info = {
             participantId: formData.get('participantId'),
-            performer: formData.get('performer'),
             age: formData.get('age'),
             gender: formData.get('gender'),
             timestamp: new Date().toISOString()
@@ -777,7 +784,10 @@ function renderDES2() {
 
 function renderEDEQS() {
     const container = document.getElementById('edeqs-questions');
-    EDEQS_QUESTIONS.forEach((question, index) => {
+    
+    // Render first 10 questions (indices 0-9)
+    for (let index = 0; index < 10; index++) {
+        const question = EDEQS_QUESTIONS[index];
         const questionDiv = document.createElement('div');
         questionDiv.className = 'question-item';
         questionDiv.innerHTML = `
@@ -786,14 +796,41 @@ function renderEDEQS() {
                 ${EDEQS_RATING_SCALE.map((option, optIndex) => `
                     <label class="rating-option">
                         <input type="radio" name="edeqs_q${index}" value="${option.value}">
-                        <span>${option.value}</span>
                         <span>${option.label}</span>
                     </label>
                 `).join('')}
             </div>
         `;
         container.appendChild(questionDiv);
-    });
+    }
+    
+    // Add instruction line
+    const instructionDiv = document.createElement('div');
+    instructionDiv.className = 'instructions';
+    instructionDiv.style.marginTop = '20px';
+    instructionDiv.style.marginBottom = '20px';
+    instructionDiv.style.fontWeight = 'bold';
+    instructionDiv.innerHTML = '<p>Over the past 7 days...</p>';
+    container.appendChild(instructionDiv);
+    
+    // Render last 2 questions (indices 10-11) with severity scale
+    for (let index = 10; index < 12; index++) {
+        const question = EDEQS_QUESTIONS[index];
+        const questionDiv = document.createElement('div');
+        questionDiv.className = 'question-item';
+        questionDiv.innerHTML = `
+            <label>${index + 1}. ${question}</label>
+            <div class="rating-scale">
+                ${EDEQS_SEVERITY_SCALE.map((option, optIndex) => `
+                    <label class="rating-option">
+                        <input type="radio" name="edeqs_q${index}" value="${option.value}">
+                        <span>${option.label}</span>
+                    </label>
+                `).join('')}
+            </div>
+        `;
+        container.appendChild(questionDiv);
+    }
 
     // Add click handlers for radio buttons
     container.querySelectorAll('input[type="radio"]').forEach(radio => {
@@ -1569,14 +1606,17 @@ function saveAssessmentsExcel(participantId) {
         
         // EDE-QS Sheet
         const edeqsData = [
-            ['Question', 'Score (0-3, representing days in past 7 days)'],
+            ['Question', 'Score', 'Scale Type'],
             ...EDEQS_QUESTIONS.map((q, i) => {
                 const key = `edeqs_q${i}`;
                 const value = participantData.edeqs && participantData.edeqs[key] !== undefined 
                     ? participantData.edeqs[key] 
                     : 0;
+                const scaleType = i < 10 
+                    ? 'Days (0-3: 0 days, 1-2 days, 3-5 days, 6-7 days)' 
+                    : 'Severity (0-3: Not at all, Slightly, Moderately, Markedly)';
                 console.log(`EDE-QS Q${i+1}: key="${key}", value=${value}`);
-                return [`Q${i + 1}: ${q}`, value];
+                return [`Q${i + 1}: ${q}`, value, scaleType];
             })
         ];
         const edeqsWS = XLSX.utils.aoa_to_sheet(edeqsData);
@@ -1633,7 +1673,6 @@ function saveMetadataExcel(participantId, accuracy) {
     stimuliData.push([]); // Empty row separator
     stimuliData.push(['--- METADATA ---', '', '', '', '', '', '', '', '', '', '', '']);
     stimuliData.push(['Participant ID', participantData.info.participantId, '', '', '', '', '', '', '', '', '', '']);
-    stimuliData.push(['Performer', participantData.info.performer, '', '', '', '', '', '', '', '', '', '']);
     stimuliData.push(['Age', participantData.info.age, '', '', '', '', '', '', '', '', '', '']);
     stimuliData.push(['Gender', participantData.info.gender, '', '', '', '', '', '', '', '', '', '']);
     stimuliData.push(['Timestamp', participantData.info.timestamp, '', '', '', '', '', '', '', '', '', '']);
