@@ -36,6 +36,21 @@
         </div>
     </div>
 
+    <!-- Introduction Page -->
+    <div id="introduction-page" class="page">
+        <div class="container">
+            <h1>Hello and welcome!</h1>
+            <div class="instructions-content">
+                <p>This is an experiment to understand the role of the body in the process of emotion recognition.</p>
+                <p><br>In this experiment, you'll be asked to fill out some questionnaires about your mental health, after which you will be shown some images and asked to recognise the emotion displayed in them. While you do this, the computer camera will record your face to help us understand if you have any response to the images.</p>
+                <p><br>This experiment is completely anonymous. The video will be stored in a secure location and will not be linked to your personal information</p>
+                <p><br>If you have any questions or concerns, please feel free to ask the researcher in the room.</p>
+                <p><br>Thank you for your time and participation!</p>
+            </div>
+            <button class="btn-primary" onclick="nextPage('introduction-page', 'assessment-sreis-page')">Continue</button>
+        </div>
+    </div>
+
     <!-- Assessment Page - SREIS -->
     <div id="assessment-sreis-page" class="page">
         <div class="container">
@@ -63,7 +78,7 @@
             <form id="sbc-form">
                 <div id="sbc-questions"></div>
             </form>
-            <button class="btn-primary" onclick="submitAssessment('sbc', 'assessment-bdi-page')">Continue</button>
+            <button class="btn-primary" onclick="submitAssessment('sbc', 'assessment-dsm5-page')">Continue</button>
         </div>
     </div>
 
@@ -87,7 +102,7 @@
             <form id="bai-form">
                 <div id="bai-questions"></div>
             </form>
-            <button class="btn-primary" onclick="submitAssessment('bai', 'assessment-dsm5-page')">Continue</button>
+            <button class="btn-primary" onclick="submitAssessment('bai', 'assessment-des2-page')">Continue</button>
         </div>
     </div>
 
@@ -99,7 +114,7 @@
             <form id="dsm5-form">
                 <div id="dsm5-questions"></div>
             </form>
-            <button class="btn-primary" onclick="submitAssessment('dsm5', 'assessment-des2-page')">Continue</button>
+            <button class="btn-primary" onclick="submitAssessment('dsm5', 'assessment-bdi-page')">Continue</button>
         </div>
     </div>
 
@@ -134,9 +149,8 @@
             <div class="instructions-content">
                 <p>In this experiment, you will be shown a series of images. Each image will be displayed for 1 second.</p>
                 <p>After each image, you will see four emotion labels. Click on the emotion label that you think matches the image presented.</p>
-                <p>Simply click on one of the four options to make your selection.</p>
                 <p>Your video will be recorded during the experiment to capture your facial expressions.</p>
-                <p><strong>Please ensure you grant camera permission when prompted.</strong></p>
+                <p><strong>Please select "Grant permission" below to allow the camera to start recording.</strong></p>
             </div>
             <button class="btn-primary" id="camera-permission-btn" onclick="requestCameraPermission()">Grant Camera Permission</button>
             <button class="btn-primary" id="start-experiment-btn" onclick="nextPage('instructions-page', 'stimuli-page')" style="display: none;">Start Experiment</button>

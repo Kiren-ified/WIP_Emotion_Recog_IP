@@ -520,6 +520,7 @@ function checkUrlHash() {
         // Map hash to page ID
         const pageMap = {
             'info': 'info-page',
+            'introduction': 'introduction-page',
             'SREIS': 'assessment-sreis-page',
             'sbc': 'assessment-sbc-page',
             'bdi': 'assessment-bdi-page',
@@ -570,7 +571,7 @@ function submitInfo() {
             gender: formData.get('gender'),
             timestamp: new Date().toISOString()
         };
-        nextPage('info-page', 'assessment-sreis-page');
+        nextPage('info-page', 'introduction-page');
     } else {
         form.reportValidity();
     }
