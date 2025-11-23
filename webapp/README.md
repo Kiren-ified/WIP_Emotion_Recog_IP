@@ -8,7 +8,6 @@ A local web application for conducting emotion recognition experiment with video
 - **Introduction Page**: Welcome message and experiment overview
 - **Assessment Pages**: Comprehensive mental health and psychological assessments
   - SREIS (Emotional Intelligence Scale)
-  - SBC (Scale of Body Connection)
   - DSM-5-TR Level 1 Cross-Cutting Symptom Measure
   - BDI-II (Beck Depression Inventory)
   - BAI (Beck Anxiety Inventory)
@@ -82,7 +81,6 @@ For each participant, the following files are automatically downloaded:
 1. **`{participantId}_assessment.xlsx`**: Contains all assessment responses organized by sheet:
    - Participant Info
    - SREIS responses
-   - SBC responses
    - DSM-5-TR responses
    - BDI-II responses
    - BAI responses
@@ -105,8 +103,7 @@ For each participant, the following files are automatically downloaded:
 
 ### Assessment Order
 1. SREIS (Emotional Intelligence Scale)
-2. SBC (Scale of Body Connection)
-3. DSM-5-TR Level 1 Cross-Cutting Symptom Measure
+2. DSM-5-TR Level 1 Cross-Cutting Symptom Measure
 4. BDI-II (Beck Depression Inventory)
 5. BAI (Beck Anxiety Inventory)
 6. DES-II (Dissociative Experiences Scale)

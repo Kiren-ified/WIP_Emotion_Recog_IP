@@ -3,12 +3,12 @@ const MAX_STIMULI = 3;
 let participantData = {
     info: {},
     sreis: {},
-    sbc: {},
     bdi: {},
     bai: {},
     dsm5: {},
     des2: {},
     edeqs: {},
+    aq: {},
     stimuli: [],
     startTime: null
 };
@@ -50,39 +50,6 @@ const SREIS_answers = [
     { value: 3, label: "Neither nor" },
     { value: 4, label: "Moderately accurate" },
     { value: 5, label: "Very accurate" }
-];
-
-// Scale of Body Connection (SBC) Questions - 20 items
-const SBC_QUESTIONS = [
-    "If there is tension in my body, I am aware of the tension.",
-    "It is difficult for me to identify my emotions.",
-    "I notice that my breathing becomes shallow when I am nervous.",
-    "I notice my emotional response to caring touch.",
-    "My body feels frozen, as though numb, during uncomfortble situations.",
-    "I notice how my body changes when I am angry.",
-    "I feel like I am looking at my body from outside of my body.",
-    "I am aware of internal sensation during sexual activity.",
-    "I can feel my breath travel through my body when I exhale deeply.",
-    "I feel separated from my body.",
-    "It is hard for me to express certain emotions.",
-    "I take cues from my body to help me understand how I feel.",
-    "When I am physically uncomfortable, I think about what might have caused the discomfort.",
-    "I listen for information from my body about my emotional state.",
-    "When I am stressed, I notice the stress in my body.",
-    "I distract myself from feelings of physical discomfort.",
-    "When I am tense, I take note of where the tension is located in my body.",
-    "I notice that my body feels different after a peaceful experience.",
-    "I feel separated from my body when I am engaged in sexual activity.",
-    "It  is difficult for me to pay attention to my emotions."
-];
-
-// SBC Rating Scale (0-4)
-const SBC_RATING_SCALE = [
-    { value: 0, label: "Not at all" },
-    { value: 1, label: "A little bit" },
-    { value: 2, label: "Some of the time" },
-    { value: 3, label: "Most of the time" },
-    { value: 4, label: "All of the time" }
 ];
 
 // DSM-5-TR Level 1 Cross-Cutting Symptom Measure - 13 domains
@@ -267,6 +234,68 @@ const EDEQS_SEVERITY_SCALE = [
     { value: 1, label: "Slightly" },
     { value: 2, label: "Moderately" },
     { value: 3, label: "Markedly" }
+];
+
+// AQ (Autism Spectrum Quotient) Adult - 50 questions
+const AQ_QUESTIONS = [
+    "I prefer to do things with others rather than on my own.",
+    "I prefer to do things the same way over and over again.",
+    "If I try to imagine something, I find it very easy to create a picture in my mind.",
+    "I frequently get so strongly absorbed in one thing that I lose sight of other things.",
+    "I often notice small sounds when others do not.",
+    "I usually notice car number plates or similar strings of information.",
+    "Other people frequently tell me that what I've said is impolite, even though I think it is polite.",
+    "When I'm reading a story, I can easily imagine what the characters might look like.",
+    "I am fascinated by dates.",
+    "In a social group, I can easily keep track of several different people's conversations.",
+    "I find social situations easy.",
+    "I tend to notice details that others do not.",
+    "I would rather go to a library than a party.",
+    "I find making up stories easy.",
+    "I find myself drawn more strongly to people than to things.",
+    "I tend to have very strong interests, which I get upset about if I can't pursue.",
+    "I enjoy social chit-chat.",
+    "When I talk, it isn't always easy for others to get a word in edgeways.",
+    "I am fascinated by numbers.",
+    "When I'm reading a story, I find it difficult to work out the characters' intentions.",
+    "I don't particularly enjoy reading fiction.",
+    "I find it hard to make new friends.",
+    "I notice patterns in things all the time.",
+    "I would rather go to the theatre than a museum.",
+    "It does not upset me if my daily routine is disturbed.",
+    "I often find that I don't know how to keep a conversation going.",
+    "I find it easy to 'read between the lines' when someone is talking to me.",
+    "I usually concentrate more on the whole picture, rather than the small details.",
+    "I am not very good at remembering phone numbers.",
+    "I don't usually notice small changes in a situation, or a person's appearance.",
+    "I know how to tell if someone listening to me is getting bored.",
+    "I find it easy to do more than one thing at once.",
+    "When I talk on the phone, I'm not sure when it's my turn to speak.",
+    "I enjoy doing things spontaneously.",
+    "I am often the last to understand the point of a joke.",
+    "I find it easy to work out what someone is thinking or feeling just by looking at their face.",
+    "If there is an interruption, I can switch back to what I was doing very quickly.",
+    "I am good at social chit-chat.",
+    "People often tell me that I keep going on and on about the same thing.",
+    "When I was young, I used to enjoy playing games involving pretending with other children.",
+    "I like to collect information about categories of things (e.g., types of car, types of bird, types of train, types of plant, etc.).",
+    "I find it difficult to imagine what it would be like to be someone else.",
+    "I like to carefully plan any activities I participate in.",
+    "I enjoy social occasions.",
+    "I find it difficult to work out people's intentions.",
+    "New situations make me anxious.",
+    "I enjoy meeting new people.",
+    "I am a good diplomat.",
+    "I am not very good at remembering people's date of birth.",
+    "I find it very easy to play games with children that involve pretending."
+];
+
+// AQ Rating Scale (0-3)
+const AQ_RATING_SCALE = [
+    { value: 0, label: "Definitely Agree" },
+    { value: 1, label: "Slightly Agree" },
+    { value: 2, label: "Slightly Disagree" },
+    { value: 3, label: "Definitely Disagree" }
 ];
 
 // BDI-II Questions (Beck Depression Inventory) - Full version with 4 statements per question
@@ -499,12 +528,12 @@ const BAI_RATING_SCALE = [
 document.addEventListener('DOMContentLoaded', function() {
     loadStimuliConfig();
     renderSREIS();
-    renderSBC();
     renderBDI();
     renderBAI();
     renderDSM5();
     renderDES2();
     renderEDEQS();
+    renderAQ();
     
     // Check URL hash for direct page access
     checkUrlHash();
@@ -522,12 +551,12 @@ function checkUrlHash() {
             'info': 'info-page',
             'introduction': 'introduction-page',
             'SREIS': 'assessment-sreis-page',
-            'sbc': 'assessment-sbc-page',
             'bdi': 'assessment-bdi-page',
             'bai': 'assessment-bai-page',
             'dsm5': 'assessment-dsm5-page',
             'des2': 'assessment-des2-page',
             'edeqs': 'assessment-edeqs-page',
+            'aq': 'assessment-aq-page',
             'instructions': 'instructions-page',
             'stimuli': 'stimuli-page',
             'thankyou': 'thankyou-page'
@@ -589,36 +618,6 @@ function renderSREIS() {
                 ${SREIS_answers.map((option, optIndex) => `
                     <label class="rating-option">
                         <input type="radio" name="sreis_q${index}" value="${option.value}">
-                        <span>${option.value}</span>
-                        <span>${option.label}</span>
-                    </label>
-                `).join('')}
-            </div>
-        `;
-        container.appendChild(questionDiv);
-    });
-
-    // Add click handlers for radio buttons
-    container.querySelectorAll('input[type="radio"]').forEach(radio => {
-        radio.addEventListener('change', function() {
-            const parent = this.closest('.rating-option');
-            parent.parentElement.querySelectorAll('.rating-option').forEach(opt => opt.classList.remove('selected'));
-            parent.classList.add('selected');
-        });
-    });
-}
-
-function renderSBC() {
-    const container = document.getElementById('sbc-questions');
-    SBC_QUESTIONS.forEach((question, index) => {
-        const questionDiv = document.createElement('div');
-        questionDiv.className = 'question-item';
-        questionDiv.innerHTML = `
-            <label>${index + 1}. ${question}</label>
-            <div class="rating-scale">
-                ${SBC_RATING_SCALE.map((option, optIndex) => `
-                    <label class="rating-option">
-                        <input type="radio" name="sbc_q${index}" value="${option.value}">
                         <span>${option.value}</span>
                         <span>${option.label}</span>
                     </label>
@@ -832,6 +831,35 @@ function renderEDEQS() {
         `;
         container.appendChild(questionDiv);
     }
+
+    // Add click handlers for radio buttons
+    container.querySelectorAll('input[type="radio"]').forEach(radio => {
+        radio.addEventListener('change', function() {
+            const parent = this.closest('.rating-option');
+            parent.parentElement.querySelectorAll('.rating-option').forEach(opt => opt.classList.remove('selected'));
+            parent.classList.add('selected');
+        });
+    });
+}
+
+function renderAQ() {
+    const container = document.getElementById('aq-questions');
+    AQ_QUESTIONS.forEach((question, index) => {
+        const questionDiv = document.createElement('div');
+        questionDiv.className = 'question-item';
+        questionDiv.innerHTML = `
+            <label>${index + 1}. ${question}</label>
+            <div class="rating-scale">
+                ${AQ_RATING_SCALE.map((option, optIndex) => `
+                    <label class="rating-option">
+                        <input type="radio" name="aq_q${index}" value="${option.value}">
+                        <span>${option.label}</span>
+                    </label>
+                `).join('')}
+            </div>
+        `;
+        container.appendChild(questionDiv);
+    });
 
     // Add click handlers for radio buttons
     container.querySelectorAll('input[type="radio"]').forEach(radio => {
@@ -1508,7 +1536,6 @@ function saveAssessmentsExcel(participantId) {
         
         // Debug: Check what data we have
         console.log('SREIS data:', participantData.sreis);
-        console.log('SBC data:', participantData.sbc);
         console.log('BDI data:', participantData.bdi);
         console.log('BAI data:', participantData.bai);
         console.log('DSM-5 data:', participantData.dsm5);
@@ -1529,21 +1556,6 @@ function saveAssessmentsExcel(participantId) {
         ];
         const sreisWS = XLSX.utils.aoa_to_sheet(sreisData);
         XLSX.utils.book_append_sheet(wb, sreisWS, 'SREIS');
-        
-        // SBC Sheet
-        const sbcData = [
-            ['Question', 'Score'],
-            ...SBC_QUESTIONS.map((q, i) => {
-                const key = `sbc_q${i}`;
-                const value = participantData.sbc && participantData.sbc[key] !== undefined 
-                    ? participantData.sbc[key] 
-                    : 0;
-                console.log(`SBC Q${i+1}: key="${key}", value=${value}`);
-                return [`Q${i + 1}: ${q}`, value];
-            })
-        ];
-        const sbcWS = XLSX.utils.aoa_to_sheet(sbcData);
-        XLSX.utils.book_append_sheet(wb, sbcWS, 'SBC');
         
         // BDI Sheet
         const bdiData = [
@@ -1622,6 +1634,21 @@ function saveAssessmentsExcel(participantId) {
         ];
         const edeqsWS = XLSX.utils.aoa_to_sheet(edeqsData);
         XLSX.utils.book_append_sheet(wb, edeqsWS, 'EDE-QS');
+        
+        // AQ Sheet
+        const aqData = [
+            ['Question', 'Score (0-3: Definitely Agree, Slightly Agree, Slightly Disagree, Definitely Disagree)'],
+            ...AQ_QUESTIONS.map((q, i) => {
+                const key = `aq_q${i}`;
+                const value = participantData.aq && participantData.aq[key] !== undefined 
+                    ? participantData.aq[key] 
+                    : 0;
+                console.log(`AQ Q${i+1}: key="${key}", value=${value}`);
+                return [`Q${i + 1}: ${q}`, value];
+            })
+        ];
+        const aqWS = XLSX.utils.aoa_to_sheet(aqData);
+        XLSX.utils.book_append_sheet(wb, aqWS, 'AQ');
         
         const excelBlob = XLSX.write(wb, { type: 'array', bookType: 'xlsx' });
         console.log(`Downloading assessment Excel for ${participantId}...`);

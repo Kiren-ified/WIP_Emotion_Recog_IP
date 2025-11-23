@@ -63,22 +63,7 @@
             <form id="sreis-form">
                 <div id="sreis-questions"></div>
             </form>
-            <button class="btn-primary" onclick="submitAssessment('sreis', 'assessment-sbc-page')">Continue</button>
-        </div>
-    </div>
-
-    <!-- Assessment Page - SBC -->
-    <div id="assessment-sbc-page" class="page">
-        <div class="container">
-            <h1>Scale of Body Connection (SBC)</h1>
-            <p class="instructions">For each statement please check the box that best answers the way you generally feel.
-                There are no right answers, please answer as truthfully as you can. There are two questions about sexual
-                activity; please consider all sexual activity including self-stimulation. If you do not engage in sexual activity,
-                please leave these questions blank.</p>
-            <form id="sbc-form">
-                <div id="sbc-questions"></div>
-            </form>
-            <button class="btn-primary" onclick="submitAssessment('sbc', 'assessment-dsm5-page')">Continue</button>
+            <button class="btn-primary" onclick="submitAssessment('sreis', 'assessment-dsm5-page')">Continue</button>
         </div>
     </div>
 
@@ -138,7 +123,19 @@
             <form id="edeqs-form">
                 <div id="edeqs-questions"></div>
             </form>
-            <button class="btn-primary" onclick="submitAssessment('edeqs', 'instructions-page')">Continue</button>
+            <button class="btn-primary" onclick="submitAssessment('edeqs', 'assessment-aq-page')">Continue</button>
+        </div>
+    </div>
+
+    <!-- Assessment Page - AQ -->
+    <div id="assessment-aq-page" class="page">
+        <div class="container">
+            <h1>Autism Spectrum Quotient (AQ) - Adult</h1>
+            <p class="instructions">Please read each statement very carefully and rate how strongly you agree or disagree with it. For each statement, select the response that best describes you.</p>
+            <form id="aq-form">
+                <div id="aq-questions"></div>
+            </form>
+            <button class="btn-primary" onclick="submitAssessment('aq', 'instructions-page')">Continue</button>
         </div>
     </div>
 
@@ -149,8 +146,8 @@
             <div class="instructions-content">
                 <p>In this experiment, you will be shown a series of images. Each image will be displayed for 1 second.</p>
                 <p>After each image, you will see four emotion labels. Click on the emotion label that you think matches the image presented.</p>
-                <p>Your video will be recorded during the experiment to capture your facial expressions.</p>
-                <p><strong>Please select "Grant permission" below to allow the camera to start recording.</strong></p>
+                <p>Your video will be recorded while you do this task experiment. </p>
+                <p><strong>Please select "Grant Camera permission" below to allow the camera to start recording.</strong></p>
             </div>
             <button class="btn-primary" id="camera-permission-btn" onclick="requestCameraPermission()">Grant Camera Permission</button>
             <button class="btn-primary" id="start-experiment-btn" onclick="nextPage('instructions-page', 'stimuli-page')" style="display: none;">Start Experiment</button>
