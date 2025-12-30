@@ -36,17 +36,49 @@ Creates a folder structure with:
 - `timestamps.json` - Stimulus timing information
 - `metadata.json` - Extraction results and video metadata
 
-## Example
+## Analyzing Frames
+
+After extracting frames, analyze them for emotion recognition:
+
+```bash
+python analyze_images.py output/session1
+```
+
+Optional arguments:
+- `--settings` - Analysis settings as JSON string
+- `--output` - Output filename (default: analysis_results.json)
+
+Example with custom settings:
+```bash
+python analyze_images.py output/session1 \
+    --settings '{"model_type": "gemini", "temperature": 0.5}' \
+    --output custom_results.json
+```
+
+Creates `analysis_results.json` with:
+- Analysis timestamp and settings
+- Emotion and confidence for each frame
+- Complete metadata linking to extraction
+
+## Programmatic Usage
 
 ```python
 from extract_frames import process_video
+from analyze_images import analyze_extracted_frames
 from pathlib import Path
 
+# Extract frames
 results = process_video(
     video_path=Path("video.webm"),
     timestamps_ms=[1000.0, 3500.0],
     stimulus_names=["stim_A", "stim_B"],
     output_folder=Path("output/session1"),
     window_ms=500.0
+)
+
+# Analyze frames
+analysis = analyze_extracted_frames(
+    extraction_folder=Path("output/session1"),
+    analysis_settings={"model_type": "gemini", "temperature": 0.5}
 )
 ```
