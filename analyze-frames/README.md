@@ -11,6 +11,13 @@ source .venv/bin/activate
 pip install -r requirements.txt
 ```
 
+Set up your Gemini API key:
+```bash
+export GEMINI_API_KEY='your-api-key-here'
+```
+
+Get your API key from: https://aistudio.google.com/apikey
+
 ## Usage
 
 ```bash
@@ -38,27 +45,28 @@ Creates a folder structure with:
 
 ## Analyzing Frames
 
-After extracting frames, analyze them for emotion recognition:
+After extracting frames, analyze them for emotion recognition using Gemini:
 
 ```bash
 python analyze_images.py output/session1
 ```
 
 Optional arguments:
-- `--settings` - Analysis settings as JSON string
+- `--settings` - Analysis settings as JSON string (e.g., `'{"model": "gemini-3-flash-preview"}'`)
 - `--output` - Output filename (default: analysis_results.json)
 
-Example with custom settings:
+Example with custom model:
 ```bash
 python analyze_images.py output/session1 \
-    --settings '{"model_type": "gemini", "temperature": 0.5}' \
+    --settings '{"model": "gemini-3-flash-preview"}' \
     --output custom_results.json
 ```
 
 Creates `analysis_results.json` with:
 - Analysis timestamp and settings
-- Emotion and confidence for each frame
+- Emotion and description for each frame
 - Complete metadata linking to extraction
+- Raw API responses
 
 ## Programmatic Usage
 
@@ -79,6 +87,6 @@ results = process_video(
 # Analyze frames
 analysis = analyze_extracted_frames(
     extraction_folder=Path("output/session1"),
-    analysis_settings={"model_type": "gemini", "temperature": 0.5}
+    analysis_settings={"model": "gemini-3-flash-preview"}
 )
 ```

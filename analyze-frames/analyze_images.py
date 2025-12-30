@@ -1,40 +1,89 @@
 #!/usr/bin/env python3
-"""
-Analyze extracted frames for emotion recognition.
-
-Currently uses a placeholder function that will be replaced with:
-- Gemini (multimodal LLM) API calls
-- Emotion recognition models
-"""
+"""Analyze extracted frames for emotion recognition using Gemini API."""
 
 import json
+import os
 from pathlib import Path
-from typing import Dict, Any, List
+from typing import Dict, Any
 from datetime import datetime
 import argparse
+import re
+
+from google import genai
+from google.genai import types
+
+DEFAULT_MODEL = "gemini-3-flash-preview"
+
+DEBUG_MAX_API_CALLS = 2
+
+def get_api_key() -> str:
+    """Get Gemini API key from GEMINI_API_KEY environment variable."""
+    api_key = os.environ.get("GEMINI_API_KEY")
+    if not api_key:
+        raise ValueError(
+            "GEMINI_API_KEY environment variable not set.\n"
+            "Please set it with: export GEMINI_API_KEY='your-api-key'\n"
+            "Get your API key from: https://aistudio.google.com/apikey"
+        )
+    return api_key
+
+
+def parse_json(text: str) -> Dict[str, Any]:
+    """Parse JSON from text, extracting the first JSON object found."""
+    start = text.find('{')
+    end = text.rfind('}')
+    
+    if start == -1 or end == -1 or start > end:
+        print(f"Warning: No JSON object found in response")
+        print(f"Response text: {text}")
+        return {}
+    
+    json_str = text[start:end + 1]
+    
+    try:
+        return json.loads(json_str)
+    except json.JSONDecodeError as e:
+        print(f"Warning: Failed to parse JSON: {e}")
+        print(f"Response text: {text}")
+        return {}
 
 
 def analyze_image(filepath: Path, settings: Dict[str, Any]) -> Dict[str, Any]:
-    """
-    Placeholder for image analysis.
+    """Analyze image for emotion using Gemini API."""
+    if not filepath.exists():
+        return {"error": f"Image file not found: {filepath}", "method": "gemini"}
 
-    TODO: Replace with actual implementation using:
-    - Gemini API for multimodal LLM analysis
-    - Emotion recognition models
+    model = settings.get("model", DEFAULT_MODEL)
 
-    Args:
-        filepath: Path to image file
-        settings: Analysis settings/configuration
+    try:
+        with open(filepath, 'rb') as f:
+            image_bytes = f.read()
 
-    Returns:
-        Dict with emotion label and confidence score
-    """
-    # PLACEHOLDER - Replace with actual model calls
-    return {
-        "emotion": "neutral",
-        "confidence": 0.85,
-        "method": "placeholder"
-    }
+        client = genai.Client(api_key=get_api_key())
+        response = client.models.generate_content(
+            model=model,
+            contents=[
+                types.Part.from_bytes(data=image_bytes, mime_type='image/jpeg'),
+                'Describe the facial expression in the image. Then return JSON with the emotion (disgust|sadness|happiness|fear|anger|surprise), description, and confidence level (low|high).'
+            ],
+            config=types.GenerateContentConfig(
+                thinking_config=types.ThinkingConfig(thinking_level="minimal")
+            ),
+        )
+
+        if not response.text:
+            return {"error": "Empty response from API", "method": "gemini", "model": model}
+
+        result = parse_json(response.text)
+        result["method"] = "gemini"
+        result["model"] = model
+        result["raw_response"] = response.text
+        return result
+
+    except ValueError:
+        raise
+    except Exception as e:
+        return {"error": str(e), "method": "gemini", "model": model}
 
 
 def analyze_extracted_frames(
@@ -42,18 +91,7 @@ def analyze_extracted_frames(
     analysis_settings: Dict[str, Any],
     output_name: str = "analysis_results.json"
 ) -> Dict[str, Any]:
-    """
-    Analyze all frames from a previous extraction.
-
-    Args:
-        extraction_folder: Folder containing extracted frames and metadata
-        analysis_settings: Settings for the analysis (model config, etc.)
-        output_name: Name for output JSON file
-
-    Returns:
-        Dict with analysis results and metadata
-    """
-    # Load extraction metadata
+    """Analyze all frames from a previous extraction."""
     metadata_file = extraction_folder / "metadata.json"
     if not metadata_file.exists():
         raise FileNotFoundError(f"No metadata.json found in {extraction_folder}")
@@ -61,7 +99,6 @@ def analyze_extracted_frames(
     with open(metadata_file, "r") as f:
         extraction_metadata = json.load(f)
 
-    # Initialize results structure
     results = {
         "analysis_timestamp": datetime.now().isoformat(),
         "extraction_folder": str(extraction_folder),
@@ -72,7 +109,6 @@ def analyze_extracted_frames(
 
     frames_dir = extraction_folder / "frames"
 
-    # Analyze each stimulus
     for stimulus_info in extraction_metadata["stimuli"]:
         stimulus_name = stimulus_info["name"]
 
@@ -93,7 +129,6 @@ def analyze_extracted_frames(
             "frame_results": []
         }
 
-        # Analyze each frame for this stimulus
         for frame_info in stimulus_info.get("frames", []):
             frame_path = frames_dir / stimulus_name / frame_info["filename"]
 
@@ -101,10 +136,8 @@ def analyze_extracted_frames(
                 print(f"  Warning: Frame not found: {frame_path}")
                 continue
 
-            # Call analysis function
             analysis = analyze_image(frame_path, analysis_settings)
 
-            # Store results with frame metadata
             frame_result = {
                 "filename": frame_info["filename"],
                 "frame_number": frame_info["frame_number"],
@@ -117,11 +150,14 @@ def analyze_extracted_frames(
             stimulus_results["frames_analyzed"] += 1
 
             print(f"  Frame {frame_info['frame_number']}: "
-                  f"{analysis['emotion']} (confidence: {analysis['confidence']:.2f})")
+                  f"{analysis['emotion']} (confidence: {analysis['confidence']})")
+            
+            if stimulus_results["frames_analyzed"] >= DEBUG_MAX_API_CALLS:
+                print(f"Testing: reached max API calls: {DEBUG_MAX_API_CALLS}")
+                break
 
         results["stimuli_analysis"].append(stimulus_results)
 
-    # Save results
     output_file = extraction_folder / output_name
     with open(output_file, "w") as f:
         json.dump(results, f, indent=2)
@@ -135,30 +171,19 @@ def analyze_extracted_frames(
 
 
 def main():
-    parser = argparse.ArgumentParser(
-        description="Analyze extracted video frames for emotion recognition"
-    )
-    parser.add_argument("extraction_folder", type=Path,
-                        help="Folder containing extracted frames and metadata")
-    parser.add_argument("--settings", type=json.loads, default={},
-                        help="Analysis settings as JSON string")
-    parser.add_argument("--output", type=str, default="analysis_results.json",
-                        help="Output filename (default: analysis_results.json)")
+    parser = argparse.ArgumentParser(description="Analyze extracted video frames for emotion recognition")
+    parser.add_argument("extraction_folder", type=Path, help="Folder containing extracted frames and metadata")
+    parser.add_argument("--settings", type=json.loads, default={}, help="Analysis settings as JSON string")
+    parser.add_argument("--output", type=str, default="analysis_results.json", help="Output filename")
 
     args = parser.parse_args()
 
-    # Default settings (can be overridden with --settings)
-    default_settings = {
-        "model_type": "placeholder",
-        "version": "1.0",
-        "temperature": 0.0,
-        "description": "Placeholder analysis - replace with Gemini/emotion models"
-    }
-    default_settings.update(args.settings)
+    settings = {"model": DEFAULT_MODEL, "description": "Gemini multimodal emotion analysis"}
+    settings.update(args.settings)
 
     analyze_extracted_frames(
         extraction_folder=args.extraction_folder,
-        analysis_settings=default_settings,
+        analysis_settings=settings,
         output_name=args.output
     )
 
