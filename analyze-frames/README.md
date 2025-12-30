@@ -1,9 +1,16 @@
-# Frame Extraction Tool
+# Video Frame Analysis
 
-Extract frames from video files within a 500ms window for each stimulus presentation.
+Extract and analyze frames from video recordings to detect emotions at specific time points.
+
+## Prerequisites
+
+- A `.webm` video file from your experiment
+- Python 3.12 or later
+- An API key for image analysis (get one at https://aistudio.google.com/apikey)
 
 ## Setup
 
+1. Install dependencies:
 ```bash
 cd analyze-frames
 python3.12 -m venv .venv
@@ -11,64 +18,44 @@ source .venv/bin/activate
 pip install -r requirements.txt
 ```
 
-Set up your Gemini API key:
+2. Set your API key:
 ```bash
 export GEMINI_API_KEY='your-api-key-here'
 ```
 
-Get your API key from: https://aistudio.google.com/apikey
+## Step 1: Extract Frames
 
-## Usage
+Extract frames from your video at specific timestamps:
 
 ```bash
 python extract_frames.py video.webm \
     --timestamps 1000 3500 6200 \
     --names stimulus_A stimulus_B stimulus_C \
-    --output output/session1 \
-    --window 500
+    --output output/session1
 ```
 
-## Arguments
+**Options:**
+- `--timestamps` - Time points in milliseconds when stimuli were presented (required)
+- `--names` - Labels for each stimulus (optional)
+- `--output` - Where to save the frames (default: output)
+- `--window` - Duration around each timestamp to capture in ms (default: 500)
 
-- `video` - Path to video file (webm, mp4, etc.)
-- `--timestamps` - Stimulus presentation times in milliseconds (required)
-- `--names` - Names for each stimulus (optional, defaults to stim_0, stim_1, ...)
-- `--output` - Output folder path (default: output)
-- `--window` - Window duration in ms (default: 500)
+**Output:** Creates a folder with extracted frames and metadata files.
 
-## Output
+## Step 2: Analyze Frames
 
-Creates a folder structure with:
-- `frames/` - Subfolders for each stimulus containing extracted JPG frames
-- `timestamps.json` - Stimulus timing information
-- `metadata.json` - Extraction results and video metadata
-
-## Analyzing Frames
-
-After extracting frames, analyze them for emotion recognition using Gemini:
+Analyze the extracted frames for emotion recognition:
 
 ```bash
 python analyze_images.py output/session1
 ```
 
-Optional arguments:
-- `--settings` - Analysis settings as JSON string (e.g., `'{"model": "gemini-3-flash-preview"}'`)
-- `--output` - Output filename (default: analysis_results.json)
+**Options:**
+- `--output` - Name for the results file (default: analysis_results.json)
 
-Example with custom model:
-```bash
-python analyze_images.py output/session1 \
-    --settings '{"model": "gemini-3-flash-preview"}' \
-    --output custom_results.json
-```
+**Output:** Creates a JSON file with emotion and description for each frame.
 
-Creates `analysis_results.json` with:
-- Analysis timestamp and settings
-- Emotion and description for each frame
-- Complete metadata linking to extraction
-- Raw API responses
-
-## Programmatic Usage
+## Python Usage
 
 ```python
 from extract_frames import process_video
@@ -80,13 +67,11 @@ results = process_video(
     video_path=Path("video.webm"),
     timestamps_ms=[1000.0, 3500.0],
     stimulus_names=["stim_A", "stim_B"],
-    output_folder=Path("output/session1"),
-    window_ms=500.0
+    output_folder=Path("output/session1")
 )
 
 # Analyze frames
 analysis = analyze_extracted_frames(
-    extraction_folder=Path("output/session1"),
-    analysis_settings={"model": "gemini-3-flash-preview"}
+    extraction_folder=Path("output/session1")
 )
 ```
