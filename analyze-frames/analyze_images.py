@@ -11,10 +11,14 @@ import re
 
 from google import genai
 from google.genai import types
+from dotenv import load_dotenv
 
 DEFAULT_MODEL = "gemini-3-flash-preview"
 
 DEBUG_MAX_API_CALLS = 2
+EXPERIMENTAL_ONLY_TWO_FRAMES = True
+
+load_dotenv()
 
 def get_api_key() -> str:
     """Get Gemini API key from GEMINI_API_KEY environment variable."""
@@ -75,6 +79,14 @@ def analyze_image(filepath: Path, settings: Dict[str, Any]) -> Dict[str, Any]:
             return {"error": "Empty response from API", "method": "gemini", "model": model}
 
         result = parse_json(response.text)
+        if not result:
+            # JSON parsing failed, return error with raw response
+            return {
+                "error": "Failed to parse JSON from response",
+                "method": "gemini",
+                "model": model,
+                "raw_response": response.text
+            }
         result["method"] = "gemini"
         result["model"] = model
         result["raw_response"] = response.text
@@ -128,8 +140,13 @@ def analyze_extracted_frames(
             "frames_analyzed": 0,
             "frame_results": []
         }
+        if EXPERIMENTAL_ONLY_TWO_FRAMES:
+            chosen_frames = stimulus_info.get("frames", [])
+            chosen_frames = [chosen_frames[0], chosen_frames[-1]] if len(chosen_frames) >= 2 else chosen_frames
+        else:
+            chosen_frames = stimulus_info.get("frames", [])
 
-        for frame_info in stimulus_info.get("frames", []):
+        for frame_info in chosen_frames:
             frame_path = frames_dir / stimulus_name / frame_info["filename"]
 
             if not frame_path.exists():
@@ -149,8 +166,9 @@ def analyze_extracted_frames(
             stimulus_results["frame_results"].append(frame_result)
             stimulus_results["frames_analyzed"] += 1
 
-            print(f"  Frame {frame_info['frame_number']}: "
-                  f"{analysis['emotion']} (confidence: {analysis['confidence']})")
+            emotion = analysis.get('emotion', analysis.get('error', 'unknown'))
+            confidence = analysis.get('confidence', 'N/A')
+            print(f"  Frame {frame_info['frame_number']}: {emotion} (confidence: {confidence})")
             
             if stimulus_results["frames_analyzed"] >= DEBUG_MAX_API_CALLS:
                 print(f"Testing: reached max API calls: {DEBUG_MAX_API_CALLS}")
