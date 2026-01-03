@@ -5,6 +5,7 @@ Extract and analyze frames from video recordings to detect emotions at specific 
 ## Prerequisites
 
 - A `.webm` video file from your experiment
+- The `_timing.json` file from the experiment (auto-downloaded)
 - Python 3.12 or later
 - An API key for image analysis (get one at https://aistudio.google.com/apikey)
 
@@ -25,7 +26,21 @@ export GEMINI_API_KEY='your-api-key-here'
 
 ## Step 1: Extract Frames
 
-Extract frames from your video at specific timestamps:
+### Recommended: Use timing file from webapp
+
+After running the experiment, you'll have `{participant}_timing.json` and `{participant}_video.webm`. Place them in the same folder:
+
+```bash
+python extract_frames.py --timing-file path/to/participant_timing.json
+```
+
+This automatically:
+- Reads all stimulus timestamps from the JSON
+- Uses image names as stimulus identifiers
+- Finds the video file referenced in the JSON
+- Creates output in `output/{participant_id}/`
+
+### Alternative: Manual timestamps
 
 ```bash
 python extract_frames.py video.webm \
@@ -35,8 +50,9 @@ python extract_frames.py video.webm \
 ```
 
 **Options:**
-- `--timestamps` - Time points in milliseconds when stimuli were presented (required)
-- `--names` - Labels for each stimulus (optional)
+- `--timing-file` - JSON timing file from webapp (recommended)
+- `--timestamps` - Time points in milliseconds (manual mode)
+- `--names` - Labels for each stimulus (manual mode)
 - `--output` - Where to save the frames (default: output)
 - `--window` - Duration around each timestamp to capture in ms (default: 500)
 
@@ -58,20 +74,25 @@ python analyze_images.py output/session1
 ## Python Usage
 
 ```python
-from extract_frames import process_video
+from extract_frames import process_video, load_timing_file
 from analyze_images import analyze_extracted_frames
 from pathlib import Path
 
+# Load timing from webapp JSON
+timing = load_timing_file(Path("participant_timing.json"))
+timestamps = [s["timestamp_ms"] for s in timing["stimuli"]]
+names = [s["image_name"].replace(".jpg", "") for s in timing["stimuli"]]
+
 # Extract frames
 results = process_video(
-    video_path=Path("video.webm"),
-    timestamps_ms=[1000.0, 3500.0],
-    stimulus_names=["stim_A", "stim_B"],
-    output_folder=Path("output/session1")
+    video_path=Path("participant_video.webm"),
+    timestamps_ms=timestamps,
+    stimulus_names=names,
+    output_folder=Path(f"output/{timing['participant_id']}")
 )
 
 # Analyze frames
 analysis = analyze_extracted_frames(
-    extraction_folder=Path("output/session1")
+    extraction_folder=Path(f"output/{timing['participant_id']}")
 )
 ```
