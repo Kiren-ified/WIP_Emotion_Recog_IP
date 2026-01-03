@@ -209,12 +209,20 @@ def process_video(
     return results
 
 
+def load_timing_file(timing_path: Path) -> Dict[str, Any]:
+    """Load timing data from JSON file exported by webapp."""
+    with open(timing_path, "r") as f:
+        return json.load(f)
+
+
 def main():
     parser = argparse.ArgumentParser(
         description="Extract frames from video at specified timestamps"
     )
-    parser.add_argument("video", type=Path, help="Path to video file")
-    parser.add_argument("--timestamps", type=float, nargs="+", required=True,
+    parser.add_argument("video", type=Path, nargs="?", help="Path to video file")
+    parser.add_argument("--timing-file", type=Path,
+                        help="JSON timing file from webapp (alternative to manual timestamps)")
+    parser.add_argument("--timestamps", type=float, nargs="+",
                         help="Stimulus timestamps in milliseconds")
     parser.add_argument("--names", type=str, nargs="+",
                         help="Names for each stimulus (default: stim_0, stim_1, ...)")
@@ -225,18 +233,59 @@ def main():
 
     args = parser.parse_args()
 
-    # Generate default names if not provided
-    if args.names:
-        names = args.names
-    else:
-        names = [f"stim_{i}" for i in range(len(args.timestamps))]
+    # Load from timing file if provided
+    if args.timing_file:
+        timing_data = load_timing_file(args.timing_file)
 
-    if len(names) != len(args.timestamps):
-        parser.error("Number of names must match number of timestamps")
+        # Extract timestamps and names from timing file
+        timestamps = [s["timestamp_ms"] for s in timing_data["stimuli"]]
+        names = [s["image_name"].replace(".jpg", "").replace(".png", "")
+                 for s in timing_data["stimuli"]]
+
+        # Determine video path
+        if args.video:
+            video_path = args.video
+        else:
+            # Try to find video in same directory as timing file
+            timing_dir = args.timing_file.parent
+            video_name = timing_data.get("video_file", "")
+            if video_name:
+                video_path = timing_dir / video_name
+                if not video_path.exists():
+                    parser.error(f"Video file not found: {video_path}")
+            else:
+                parser.error("No video path provided and none found in timing file")
+
+        # Use participant_id for output folder if not specified
+        if args.output == Path("output"):
+            participant_id = timing_data.get("participant_id", "output")
+            args.output = Path(f"output/{participant_id}")
+
+        print(f"Loaded timing from: {args.timing_file}")
+        print(f"  Participant: {timing_data.get('participant_id', 'unknown')}")
+        print(f"  Stimuli: {len(timestamps)}")
+    else:
+        # Manual mode - require video and timestamps
+        if not args.video:
+            parser.error("video is required when not using --timing-file")
+        if not args.timestamps:
+            parser.error("--timestamps is required when not using --timing-file")
+
+        video_path = args.video
+        timestamps = args.timestamps
+
+        # Generate default names if not provided
+        if args.names:
+            names = args.names
+        else:
+            names = [f"stim_{i}" for i in range(len(timestamps))]
+
+        if len(names) != len(timestamps):
+            parser.error("Number of names must match number of timestamps")
 
     process_video(
-        video_path=args.video,
-        timestamps_ms=args.timestamps,
+        video_path=video_path,
+        timestamps_ms=timestamps,
         stimulus_names=names,
         output_folder=args.output,
         window_ms=args.window
