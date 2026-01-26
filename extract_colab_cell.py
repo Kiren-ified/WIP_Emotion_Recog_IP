@@ -20,6 +20,37 @@ def frame_to_ms(frame_num: int, fps: float) -> float:
     return (frame_num / fps) * 1000.0
 
 
+def estimate_fps_by_read(video_path: Path, max_frames: int = 120) -> float:
+    """Estimate fps by reading a short segment and using timestamp deltas."""
+    cap = cv2.VideoCapture(str(video_path))
+    if not cap.isOpened():
+        return 0.0
+
+    first_ms = None
+    last_ms = None
+    frame_count = 0
+
+    while frame_count < max_frames:
+        ret, _frame = cap.read()
+        if not ret:
+            break
+        current_ms = cap.get(cv2.CAP_PROP_POS_MSEC)
+        if first_ms is None:
+            first_ms = current_ms
+        last_ms = current_ms
+        frame_count += 1
+
+    cap.release()
+
+    if frame_count < 2 or first_ms is None or last_ms is None:
+        return 0.0
+    delta_ms = last_ms - first_ms
+    if delta_ms <= 0:
+        return 0.0
+
+    return (frame_count - 1) / (delta_ms / 1000.0)
+
+
 def get_video_info(video_path: Path) -> Dict[str, Any]:
     """Get video metadata (fps, frame count, duration)."""
     cap = cv2.VideoCapture(str(video_path))
@@ -43,6 +74,14 @@ def get_video_info(video_path: Path) -> Dict[str, Any]:
     if computed_fps and (fps <= 0 or fps > 240):
         fps = computed_fps
 
+    # If fps is still invalid, estimate by reading frames
+    if fps <= 0 or fps > 240:
+        estimated_fps = estimate_fps_by_read(video_path)
+        if estimated_fps > 0:
+            fps = estimated_fps
+    else:
+        estimated_fps = None
+
     width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
     height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
     cap.release()
@@ -50,6 +89,7 @@ def get_video_info(video_path: Path) -> Dict[str, Any]:
     return {
         "fps": fps,
         "computed_fps": computed_fps,
+        "estimated_fps": estimated_fps,
         "frame_count": frame_count,
         "duration_ms": duration_ms,
         "width": width,
