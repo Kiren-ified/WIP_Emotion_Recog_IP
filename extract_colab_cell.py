@@ -7,9 +7,6 @@ import cv2
 import pandas as pd
 import json
 from pathlib import Path
-import argparse
-import subprocess
-import shutil
 from typing import List, Dict, Any
 
 
@@ -58,20 +55,6 @@ def get_video_info(video_path: Path) -> Dict[str, Any]:
         "width": width,
         "height": height
     }
-
-
-def extract_frame_ffmpeg(video_path, timestamp_ms, output_path):
-    """Extract a single frame using ffmpeg (more reliable for webm)."""
-    timestamp_sec = timestamp_ms / 1000.0
-    cmd = [
-        'ffmpeg', '-y', '-ss', str(timestamp_sec),
-        '-i', str(video_path),
-        '-frames:v', '1',
-        '-q:v', '2',
-        str(output_path)
-    ]
-    result = subprocess.run(cmd, capture_output=True, text=True)
-    return Path(output_path).exists()
 
 
 def extract_frames_window(
@@ -156,7 +139,6 @@ def extract_frames(
     excel_path,
     output_dir,
     participant_id=None,
-    foi_offset_ms=None,
     baseline_start_ms=-500.0,
     baseline_end_ms=0.0,
     foi_start_ms=0.0,
@@ -170,8 +152,6 @@ def extract_frames(
         excel_path: Path to participant_metadata.xlsx
         output_dir: Base output directory
         participant_id: Optional participant ID (used for output subfolder)
-        foi_offset_ms: Custom FOI offset in ms (legacy single-frame mode).
-                       If None, uses range-based extraction with baseline/foi windows.
         baseline_start_ms: Baseline window start offset relative to stimulus (ms)
         baseline_end_ms: Baseline window end offset relative to stimulus (ms)
         foi_start_ms: FOI window start offset relative to stimulus (ms)
@@ -276,36 +256,3 @@ def extract_frames(
     total_foi = sum(s.get("foi_frames_extracted", 0) for s in results["stimuli"])
     print(f"\nExtracted {total_baseline} baseline + {total_foi} FOI frames to {frames_dir}/")
     return results
-
-
-def main():
-    parser = argparse.ArgumentParser(description="Extract baseline + FOI frames from video")
-    parser.add_argument("video", type=Path, help="Path to video file")
-    parser.add_argument("excel", type=Path, help="Path to participant_metadata.xlsx")
-    parser.add_argument("-o", "--output", type=Path, default=Path("output"), help="Output directory")
-    parser.add_argument("-p", "--participant", type=str, help="Participant ID")
-    parser.add_argument("--baseline-start", type=float, default=-500.0,
-                        help="Baseline window start offset in ms (default: -500)")
-    parser.add_argument("--baseline-end", type=float, default=0.0,
-                        help="Baseline window end offset in ms (default: 0)")
-    parser.add_argument("--foi-start", type=float, default=0.0,
-                        help="FOI window start offset in ms (default: 0)")
-    parser.add_argument("--foi-end", type=float, default=1000.0,
-                        help="FOI window end offset in ms (default: 1000)")
-
-    args = parser.parse_args()
-
-    extract_frames(
-        video_path=args.video,
-        excel_path=args.excel,
-        output_dir=args.output,
-        participant_id=args.participant,
-        baseline_start_ms=args.baseline_start,
-        baseline_end_ms=args.baseline_end,
-        foi_start_ms=args.foi_start,
-        foi_end_ms=args.foi_end
-    )
-
-
-if __name__ == "__main__":
-    main()
